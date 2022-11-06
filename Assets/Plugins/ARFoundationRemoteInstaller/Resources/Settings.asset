@@ -36,8 +36,8 @@ MonoBehaviour:
     normalLatency: 0.2
     targetFrameRate: 30
   editorGameViewSettings:
-    resolutionScale: 0.33333334
-    maxEditorViewFps: 10
+    resolutionScale: 1
+    maxEditorViewFps: 30
   packages:
   - displayName: AR Foundation Remote
     version: 2.0.26-release.0
