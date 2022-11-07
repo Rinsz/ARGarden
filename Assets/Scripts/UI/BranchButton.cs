@@ -1,5 +1,5 @@
 using System.Collections;
-using System.Collections.Generic;
+using System.Collections.Concurrent;
 using TMPro;
 using UI;
 using UnityEngine;
@@ -18,14 +18,14 @@ public class BranchButton : MonoBehaviour
     public RenderSettings renderSettings;
     public LinearRenderer linearRenderer;
 
-    private List<(GameObject Button, ButtonFader Fader)> buttons;
+    private ConcurrentBag<(GameObject Button, ButtonFader Fader)> buttons;
     private int screenWidth = 0;
     private int screenHeight = 0;
     private Coroutine runningRender = null;
 
     private void Start()
     {
-        buttons = new List<(GameObject Button, ButtonFader Fader)>();
+        buttons = new ConcurrentBag<(GameObject Button, ButtonFader Fader)>();
         screenWidth = Screen.width;
         screenHeight = Screen.height;
         buttonScaler.Initialize(referenceButtonSize, referenceScreenSize, scalingMode);
@@ -37,20 +37,14 @@ public class BranchButton : MonoBehaviour
 
     private void Update()
     {
-        if (Screen.width != screenWidth || Screen.height != screenHeight)
-        {
-            screenWidth = Screen.width;
-            screenHeight = Screen.height;
-            buttonScaler.Initialize(referenceButtonSize, referenceScreenSize, scalingMode);
-            linearRenderer.AdjustSpacingToScreenSize(buttonScaler.referenceScreenSize);
-            RenderButtons();
-        }
-
-        if (!renderSettings.rendering)
+        if (Screen.width == screenWidth && Screen.height == screenHeight)
             return;
 
-        if (!renderSettings.created)
-            RenderButtons();
+        screenWidth = Screen.width;
+        screenHeight = Screen.height;
+        buttonScaler.Initialize(referenceButtonSize, referenceScreenSize, scalingMode);
+        linearRenderer.AdjustSpacingToScreenSize(buttonScaler.referenceScreenSize);
+        RenderButtons();
     }
 
     public void RenderButtons()
@@ -125,6 +119,8 @@ public class BranchButton : MonoBehaviour
             foreach (var (button, _) in childBranch.buttons)
                 Destroy(button);
             childBranch.buttons.Clear();
+            childBranch.renderSettings.rendering = false;
+            childBranch.renderSettings.created = false;
         }
     }
 
@@ -151,16 +147,17 @@ public class BranchButton : MonoBehaviour
         var buttonsSpacing = linearRenderer.buttonsSpacing;
         var position = transform.position;
 
+        var buttonsArray = this.buttons.ToArray();
         for (var i = 0; i < buttons.Count; i++)
         {
             Vector3 target;
-            buttons[i].Button.GetComponent<RectTransform>().sizeDelta = sizeDelta;
+            buttonsArray[i].Button.GetComponent<RectTransform>().sizeDelta = sizeDelta;
 
             target.x = direction.x * ((i + buttonOffset) * (sizeDelta.x + buttonsSpacing)) + position.x;
             target.y = direction.y * ((i + buttonOffset) * (sizeDelta.y + buttonsSpacing)) + position.y;
             target.z = 0;
             
-            buttons[i].Button.transform.position = target;
+            buttonsArray[i].Button.transform.position = target;
         }
     }
 }
