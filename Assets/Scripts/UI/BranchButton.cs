@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UI;
 using UnityEngine;
@@ -11,7 +12,7 @@ public class BranchButton : MonoBehaviour
     public GameObject[] buttonPrefabs;
 
     [HideInInspector] 
-    public List<GameObject> buttons;
+    public List<(GameObject Button, ButtonFader Fader)> buttons;
 
     public ScalingMode scalingMode;
     public Vector2 referenceButtonSize;
@@ -26,7 +27,7 @@ public class BranchButton : MonoBehaviour
 
     private void Start()
     {
-        buttons = new List<GameObject>();
+        buttons = new List<(GameObject Button, ButtonFader Fader)>();
         screenWidth = Screen.width;
         screenHeight = Screen.height;
         buttonScaler.Initialize(referenceButtonSize, referenceScreenSize, scalingMode);
@@ -53,12 +54,13 @@ public class BranchButton : MonoBehaviour
         if (!renderSettings.created)
             RenderButtons();
 
-        RenderLinearFade();
+        if (buttons.Any(button => !button.Fader.faded))
+            RenderLinearFade();
     }
 
     public void RenderButtons()
     {
-        if (renderSettings.created)
+        if (renderSettings.created || renderSettings.rendering)
         {
             renderSettings.created = false;
             renderSettings.rendering = false;
@@ -67,7 +69,7 @@ public class BranchButton : MonoBehaviour
         }
 
         renderSettings.rendering = true;
-        foreach (var button in buttons)
+        foreach (var (button, _) in buttons)
             Destroy(button);
         buttons.Clear();
 
@@ -90,7 +92,7 @@ public class BranchButton : MonoBehaviour
                 button.GetComponentInChildren<TMP_Text>().color = color;
             }
 
-            buttons.Add(button);
+            buttons.Add((button, button.GetComponent<ButtonFader>()));
         }
 
         SetButtonsPosition();
@@ -103,7 +105,7 @@ public class BranchButton : MonoBehaviour
         var childBranches = FindObjectsOfType<BranchButton>();
         foreach (var childBranch in childBranches)
         {
-            foreach (var button in childBranch.buttons)
+            foreach (var (button, _) in childBranch.buttons)
                 Destroy(button);
             childBranch.buttons.Clear();
             childBranch.renderSettings.rendering = false;
@@ -119,7 +121,7 @@ public class BranchButton : MonoBehaviour
             if (childBranch.transform.parent != transform.parent)
                 continue;
 
-            foreach (var button in childBranch.buttons)
+            foreach (var (button, _) in childBranch.buttons)
                 Destroy(button);
             childBranch.buttons.Clear();
         }
@@ -130,9 +132,9 @@ public class BranchButton : MonoBehaviour
         for (var i = 0; i < buttons.Count; i++)
         {
             var previousFader = i - 1 > 0
-                ? buttons[i - 1].GetComponent<ButtonFader>()
+                ? buttons[i - 1].Fader
                 : null;
-            var fader = buttons[i].GetComponent<ButtonFader>();
+            var fader = buttons[i].Fader;
 
             if (previousFader)
             {
@@ -162,14 +164,13 @@ public class BranchButton : MonoBehaviour
         for (var i = 0; i < buttons.Count; i++)
         {
             Vector3 target;
-            var rect = buttons[i].GetComponent<RectTransform>();
-            rect.sizeDelta = sizeDelta;
+            buttons[i].Button.GetComponent<RectTransform>().sizeDelta = sizeDelta;
 
             target.x = direction.x * ((i + buttonOffset) * (sizeDelta.x + buttonsSpacing)) + position.x;
             target.y = direction.y * ((i + buttonOffset) * (sizeDelta.y + buttonsSpacing)) + position.y;
             target.z = 0;
             
-            buttons[i].transform.position = target;
+            buttons[i].Button.transform.position = target;
         }
     }
 }

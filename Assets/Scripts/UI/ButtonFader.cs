@@ -1,4 +1,5 @@
-﻿using TMPro;
+﻿using System.Collections;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -10,42 +11,35 @@ public class ButtonFader : MonoBehaviour
     private TMP_Text text;
     private Color buttonColor;
     private Color textColor;
-    private bool startFade = false;
-    private float smoothness = 0f;
     private bool initialized = false;
 
     public void Start() => Initialize();
 
-    public void Update()
-    {
-        if (!startFade)
-            return;
+    public void Fade(float smoothness) =>
+        StartCoroutine(FadeCoroutine(smoothness).GetEnumerator());
 
-        Fade(smoothness);
-        if (buttonColor.a > 0.9)
-            faded = true;
-    }
-
-    public void Fade(float smoothness)
+    private IEnumerable FadeCoroutine(float smoothness)
     {
         if (!initialized)
             Initialize();
 
-        this.smoothness = smoothness;
-        startFade = true;
+        while (buttonColor.a <= 0.9)
+        {
+            buttonColor.a += smoothness;
+            buttonImage.color = buttonColor;
+            if (!text)
+                yield return buttonColor.a;
 
-        buttonColor.a += smoothness;
-        buttonImage.color = buttonColor;
-        if (!text)
-            return;
+            textColor.a += smoothness;
+            text.color = textColor;
+            yield return buttonColor.a;
+        }
 
-        textColor.a += smoothness;
-        text.color = textColor;
+        faded = true;
     }
 
     private void Initialize()
     {
-        this.startFade = false;
         this.faded = false;
         this.buttonImage = GetComponentInChildren<Image>();
         this.buttonColor = buttonImage.color;
