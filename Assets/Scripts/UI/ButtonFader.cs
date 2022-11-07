@@ -47,7 +47,7 @@ public class ButtonFader : MonoBehaviour
     {
         this.startFade = false;
         this.faded = false;
-        this.buttonImage = GetComponent<Image>();
+        this.buttonImage = GetComponentInChildren<Image>();
         this.buttonColor = buttonImage.color;
 
         var text = GetComponentInChildren<TMP_Text>();

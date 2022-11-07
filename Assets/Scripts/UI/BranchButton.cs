@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using TMPro;
 using UI;
@@ -57,6 +58,14 @@ public class BranchButton : MonoBehaviour
 
     public void RenderButtons()
     {
+        if (renderSettings.created)
+        {
+            renderSettings.created = false;
+            renderSettings.rendering = false;
+            ClearChildBranchedButtons();
+            return;
+        }
+
         renderSettings.rendering = true;
         foreach (var button in buttons)
             Destroy(button);
@@ -69,9 +78,9 @@ public class BranchButton : MonoBehaviour
             var button = Instantiate(prefab, transform, true);
             button.transform.position = transform.position;
 
-            var color = button.GetComponent<Image>().color;
+            var color = button.GetComponentInChildren<Image>().color;
             color.a = 0;
-            button.GetComponent<Image>().color = color;
+            button.GetComponentInChildren<Image>().color = color;
 
             var text = button.GetComponentInChildren<TMP_Text>();
             if (text)
@@ -87,6 +96,19 @@ public class BranchButton : MonoBehaviour
         SetButtonsPosition();
 
         renderSettings.created = true;
+    }
+
+    public void ClearAllChild()
+    {
+        var childBranches = FindObjectsOfType<BranchButton>();
+        foreach (var childBranch in childBranches)
+        {
+            foreach (var button in childBranch.buttons)
+                Destroy(button);
+            childBranch.buttons.Clear();
+            childBranch.renderSettings.rendering = false;
+            childBranch.renderSettings.created = false;
+        }
     }
 
     private void ClearChildBranchedButtons()
@@ -123,6 +145,8 @@ public class BranchButton : MonoBehaviour
             {
                 if (fader)
                     fader.Fade(renderSettings.fadeSmoothness);
+                else
+                    throw new Exception($"Fading button should have {nameof(ButtonFader)} component");
             }
         }
     }
