@@ -1,6 +1,5 @@
-using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using TMPro;
 using UI;
 using UnityEngine;
@@ -11,9 +10,6 @@ public class BranchButton : MonoBehaviour
 {
     public GameObject[] buttonPrefabs;
 
-    [HideInInspector] 
-    public List<(GameObject Button, ButtonFader Fader)> buttons;
-
     public ScalingMode scalingMode;
     public Vector2 referenceButtonSize;
     public Vector2 referenceScreenSize;
@@ -22,8 +18,10 @@ public class BranchButton : MonoBehaviour
     public RenderSettings renderSettings;
     public LinearRenderer linearRenderer;
 
+    private List<(GameObject Button, ButtonFader Fader)> buttons;
     private int screenWidth = 0;
     private int screenHeight = 0;
+    private Coroutine runningRender = null;
 
     private void Start()
     {
@@ -53,9 +51,6 @@ public class BranchButton : MonoBehaviour
 
         if (!renderSettings.created)
             RenderButtons();
-
-        if (buttons.Any(button => !button.Fader.faded))
-            RenderLinearFade();
     }
 
     public void RenderButtons()
@@ -96,7 +91,7 @@ public class BranchButton : MonoBehaviour
         }
 
         SetButtonsPosition();
-
+        runningRender = StartCoroutine(RenderLinearFade().GetEnumerator());
         renderSettings.created = true;
     }
 
@@ -115,6 +110,12 @@ public class BranchButton : MonoBehaviour
 
     private void ClearChildBranchedButtons()
     {
+        if (runningRender != null)
+        {
+            StopCoroutine(runningRender);
+            runningRender = null;   
+        }
+
         var childBranches = FindObjectsOfType<BranchButton>();
         foreach (var childBranch in childBranches)
         {
@@ -127,30 +128,19 @@ public class BranchButton : MonoBehaviour
         }
     }
 
-    private void RenderLinearFade()
+    private IEnumerable RenderLinearFade()
     {
-        for (var i = 0; i < buttons.Count; i++)
+        foreach (var (_, fader) in buttons)
         {
-            var previousFader = i - 1 > 0
-                ? buttons[i - 1].Fader
-                : null;
-            var fader = buttons[i].Fader;
+            if (!fader)
+                continue;
 
-            if (previousFader)
-            {
-                if (!previousFader.faded)
-                    continue;
-                if (fader)
-                    fader.Fade(renderSettings.fadeSmoothness);
-            }
-            else
-            {
-                if (fader)
-                    fader.Fade(renderSettings.fadeSmoothness);
-                else
-                    throw new Exception($"Fading button should have {nameof(ButtonFader)} component");
-            }
+            fader.Fade(renderSettings.fadeSmoothness);
+            while (!fader.faded)
+                yield return fader.faded;
         }
+
+        runningRender = null;
     }
 
     private void SetButtonsPosition()
