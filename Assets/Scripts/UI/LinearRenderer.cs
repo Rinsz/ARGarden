@@ -13,8 +13,8 @@ public class LinearRenderer
 
     public void AdjustSpacingToScreenSize(Vector2 referenceScreenSize)
     {
-        var referencedScreen = (referenceScreenSize.x + referenceScreenSize.y) / 2;
-        var actualScreen = (Screen.width + Screen.height) / 2;
+        var referencedScreen = referenceScreenSize.x + referenceScreenSize.y;
+        var actualScreen = Screen.width + Screen.height;
         buttonsSpacing = (defaultButtonsSpacing * actualScreen) / referencedScreen;
     }
 }
