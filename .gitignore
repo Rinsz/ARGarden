@@ -467,3 +467,4 @@ crashlytics-build.properties
 
 # ArCompanion build
 /ARFoundationRemoteCompanionApp/*
+/[Aa]ssets/[Pp]lugins/ARFoundationRemoteInstaller/[Rr]esources/Settings.asset
