@@ -149,7 +149,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 143774723}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1fc98219a83dff145947365dc914d06e, type: 3}
+  m_Script: {fileID: 11500000, guid: 697bcdcf34d7f9f41a2b0af8e5c6d8ea, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   tapThreshold: 0.2
