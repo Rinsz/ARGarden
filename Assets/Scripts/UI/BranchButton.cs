@@ -35,18 +35,6 @@ public class BranchButton : MonoBehaviour
             RenderButtons();
     }
 
-    private void Update()
-    {
-        if (Screen.width == screenWidth && Screen.height == screenHeight)
-            return;
-
-        screenWidth = Screen.width;
-        screenHeight = Screen.height;
-        buttonScaler.Initialize(referenceButtonSize, referenceScreenSize, scalingMode);
-        linearRenderer.AdjustSpacingToScreenSize(buttonScaler.referenceScreenSize);
-        RenderButtons();
-    }
-
     public void RenderButtons()
     {
         if (renderSettings.created || renderSettings.rendering)
