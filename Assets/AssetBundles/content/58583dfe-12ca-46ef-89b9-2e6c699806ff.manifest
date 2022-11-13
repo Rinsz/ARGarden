@@ -1,0 +1,39 @@
+ManifestFileVersion: 0
+CRC: 4107362555
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: 834c020db3c6fb68b867a468e2ba8eb3
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: cdc7b11857d391137ded5076299eebfa
+HashAppended: 0
+ClassTypes:
+- Class: 1
+  Script: {instanceID: 0}
+- Class: 4
+  Script: {instanceID: 0}
+- Class: 21
+  Script: {instanceID: 0}
+- Class: 23
+  Script: {instanceID: 0}
+- Class: 28
+  Script: {instanceID: 0}
+- Class: 33
+  Script: {instanceID: 0}
+- Class: 43
+  Script: {instanceID: 0}
+- Class: 48
+  Script: {instanceID: 0}
+- Class: 49
+  Script: {instanceID: 0}
+- Class: 136
+  Script: {instanceID: 0}
+- Class: 213
+  Script: {instanceID: 0}
+SerializeReferenceClassIdentifiers: []
+Assets:
+- Assets/Resources/TestBundle/Prefabs/58583dfe-12ca-46ef-89b9-2e6c699806ff.prefab
+- Assets/Resources/TestBundle/Sprites/58583dfe-12ca-46ef-89b9-2e6c699806ff.jpg
+- Assets/Resources/TestBundle/Metas/58583dfe-12ca-46ef-89b9-2e6c699806ff.json
+Dependencies: []
