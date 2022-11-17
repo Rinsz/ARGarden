@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Models
+namespace Models.Descriptors
 {
     public class ModelGroupCard : MonoBehaviour
     {

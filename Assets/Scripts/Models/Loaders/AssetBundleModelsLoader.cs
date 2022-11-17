@@ -1,0 +1,84 @@
+﻿using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using JetBrains.Annotations;
+using Models.Descriptors;
+using Newtonsoft.Json;
+using UnityEngine;
+using static UnityConstants;
+
+namespace Models.Loaders
+{
+    internal class AssetBundleModelsLoader : ScriptableObject
+    {
+        private readonly JsonSerializer serializer;
+        private readonly GameObject modelSelectionMenu;
+
+        public AssetBundleModelsLoader(JsonSerializer serializer, GameObject modelSelectionMenu)
+        {
+            this.serializer = serializer;
+            this.modelSelectionMenu = modelSelectionMenu;
+        }
+
+        public IEnumerable<ModelCardDescriptor> Load(ModelGroup group)
+        {
+            var streamingAssetsPath = Application.streamingAssetsPath;
+            var files = new DirectoryInfo(streamingAssetsPath).GetFiles();
+            var loadedBundles = files
+                .Where(file => file.Extension == Unity3dExtension)
+                .Select(file => file.Name.Replace(Unity3dExtension, string.Empty));
+
+            foreach (var filename in loadedBundles)
+            {
+                var bundle = LoadBundle(streamingAssetsPath, filename);
+                var meta = LoadMeta(bundle, filename);
+                if (meta == null)
+                    continue;
+
+                if (meta.ModelGroup != group && meta.ModelGroup != ModelGroup.Unknown)
+                {
+                    bundle.UnloadAsync(true);
+                    continue;
+                }
+
+                var image = bundle.LoadAsset<Sprite>(filename);
+                bundle.UnloadAsync(false);
+                yield return new ModelCardDescriptor
+                {
+                    Meta = meta,
+                    Image = image,
+                    SelectAction = () => SelectBundleAction(meta),
+                };
+            }
+        }
+
+        private static AssetBundle LoadBundle(string streamingAssetsPath, string filename)
+        {
+            using var fs = File.OpenRead(Path.Combine(streamingAssetsPath, $"{filename}{Unity3dExtension}"));
+            var bundleRequest = AssetBundle.LoadFromStreamAsync(fs);
+
+            return bundleRequest.assetBundle;
+        }
+
+        [CanBeNull]
+        private ModelMeta LoadMeta(AssetBundle bundle, string filename)
+        {
+            using var sr = new StringReader(bundle.LoadAsset<TextAsset>(filename).text);
+            using var jsonReader = new JsonTextReader(sr);
+            return serializer.Deserialize<ModelMeta>(jsonReader);
+        }
+        
+        private void SelectBundleAction(ModelMeta meta)
+        {
+            using var fs = File.OpenRead(Path.Combine(Application.streamingAssetsPath, $"{meta.Id}{Unity3dExtension}"));
+            var bundleRequest = AssetBundle.LoadFromStreamAsync(fs);
+
+            var bundle = bundleRequest.assetBundle;
+            var obj = bundle.LoadAsset<GameObject>(meta.Id.ToString());
+
+            Instantiate(obj);
+            bundle.UnloadAsync(false);
+            this.modelSelectionMenu.SetActive(false);
+        }
+    }
+}

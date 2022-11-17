@@ -1,4 +1,4 @@
-﻿namespace Models
+﻿namespace Models.Descriptors
 {
     public enum ModelGroup
     {

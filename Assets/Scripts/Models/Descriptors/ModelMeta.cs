@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Models
+namespace Models.Descriptors
 {
     [Serializable]
     public class ModelMeta

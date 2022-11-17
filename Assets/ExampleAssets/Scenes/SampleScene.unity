@@ -1801,7 +1801,7 @@ PrefabInstance:
     - target: {fileID: 194448028755518643, guid: 208d60ec58a87d34fac2b8ec29778266,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
-      value: Models.ModelGroupCard, Assembly-CSharp
+      value: Models.Descriptors.ModelGroupCard, Assembly-CSharp
       objectReference: {fileID: 0}
     - target: {fileID: 972396107489919763, guid: 208d60ec58a87d34fac2b8ec29778266,
         type: 3}
@@ -2066,7 +2066,7 @@ PrefabInstance:
     - target: {fileID: 1723979601429046979, guid: 208d60ec58a87d34fac2b8ec29778266,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
-      value: Models.ModelGroupCard, Assembly-CSharp
+      value: Models.Descriptors.ModelGroupCard, Assembly-CSharp
       objectReference: {fileID: 0}
     - target: {fileID: 2113118072001977326, guid: 208d60ec58a87d34fac2b8ec29778266,
         type: 3}
@@ -2236,7 +2236,7 @@ PrefabInstance:
     - target: {fileID: 5487302224234058417, guid: 208d60ec58a87d34fac2b8ec29778266,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
-      value: Models.ModelGroupCard, Assembly-CSharp
+      value: Models.Descriptors.ModelGroupCard, Assembly-CSharp
       objectReference: {fileID: 0}
     - target: {fileID: 5746638277963373475, guid: 208d60ec58a87d34fac2b8ec29778266,
         type: 3}
@@ -2256,7 +2256,7 @@ PrefabInstance:
     - target: {fileID: 5746638277963373475, guid: 208d60ec58a87d34fac2b8ec29778266,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
-      value: Models.ModelGroupCard, Assembly-CSharp
+      value: Models.Descriptors.ModelGroupCard, Assembly-CSharp
       objectReference: {fileID: 0}
     - target: {fileID: 7489847195100993426, guid: 208d60ec58a87d34fac2b8ec29778266,
         type: 3}
@@ -2306,7 +2306,7 @@ PrefabInstance:
     - target: {fileID: 8575996685035824190, guid: 208d60ec58a87d34fac2b8ec29778266,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
-      value: Models.ModelGroupCard, Assembly-CSharp
+      value: Models.Descriptors.ModelGroupCard, Assembly-CSharp
       objectReference: {fileID: 0}
     - target: {fileID: 8657854048714828268, guid: 208d60ec58a87d34fac2b8ec29778266,
         type: 3}
@@ -2326,7 +2326,7 @@ PrefabInstance:
     - target: {fileID: 8657854048714828268, guid: 208d60ec58a87d34fac2b8ec29778266,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
-      value: Models.ModelGroupCard, Assembly-CSharp
+      value: Models.Descriptors.ModelGroupCard, Assembly-CSharp
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 208d60ec58a87d34fac2b8ec29778266, type: 3}

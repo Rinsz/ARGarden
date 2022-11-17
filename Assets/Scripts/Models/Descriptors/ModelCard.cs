@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using static UnityConstants;
 
-namespace Models
+namespace Models.Descriptors
 {
     public class ModelCard : MonoBehaviour
     {
@@ -14,7 +14,7 @@ namespace Models
         public TMP_Text modelName;
         [HideInInspector] public ModelMeta meta;
 
-        public void Favorite(HashSet<string> favorites)
+        public void Favorite(ref HashSet<string> favorites)
         {
             var id = this.meta.Id.ToString();
             if (favorites.Contains(id))
