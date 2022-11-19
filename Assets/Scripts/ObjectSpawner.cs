@@ -6,18 +6,15 @@ using Lean.Touch;
 using UnityEngine.XR.ARFoundation;
 using UnityEngine.XR.ARSubsystems;
 
-public class ObjectPlacementController : MonoBehaviour
+public class ObjectSpawner : MonoBehaviour
 {
-    public GameObject placementIndicator;
     [SerializeField] private GameObject[] objectsToSpawn;
     [SerializeField] private Button[] buttons;
     [SerializeField] private Button approveButton;
-    private GameObject _arObjectToSpawn;
-    private GameObject _spawnedObject;
-    private Pose _placementPose;
+
     private ARRaycastManager _arRaycastManager;
-    private bool _placementPoseIsValid;
-    private ObjectPlacementControllerState _state = ObjectPlacementControllerState.ChoosingObject;
+
+    private GameObject _spawnedObject;
 
     private void Start()
     {
@@ -31,8 +28,7 @@ public class ObjectPlacementController : MonoBehaviour
             {
                 foreach (var button in buttons)
                     button.gameObject.SetActive(false);
-                _arObjectToSpawn = objectsToSpawn[index];
-                _state = ObjectPlacementControllerState.PlacingObject;
+                PlaceObject(objectsToSpawn[index]);
             });
         }
 
@@ -46,56 +42,26 @@ public class ObjectPlacementController : MonoBehaviour
             _spawnedObject.GetComponent<LeanPinchScale>().enabled = false;
             _spawnedObject.GetComponent<LeanTwistRotateAxis>().enabled = false;
             _spawnedObject = null;
-            _state = ObjectPlacementControllerState.ChoosingObject;
         });
         _arRaycastManager = FindObjectOfType<ARRaycastManager>();
     }
 
-    private void Update()
-    {
-        if (_state == ObjectPlacementControllerState.PlacingObject)
-            TryPlaceObject();
-    }
-
-    private void TryPlaceObject()
-    {
-        if(_spawnedObject == null
-           && _placementPoseIsValid
-           && Input.touchCount > 0
-           && Input.GetTouch(0).phase == TouchPhase.Began)
-        {
-            ARPlaceObject();
-        }
-
-        UpdatePlacementIndicator();
-    }
-
-    private void UpdatePlacementIndicator()
+    private void PlaceObject(GameObject prefab)
     {
         var screenCenter = Camera.current.ViewportToScreenPoint(new Vector3(0.5f, 0.5f));
         var hits = new List<ARRaycastHit>();
         _arRaycastManager.Raycast(screenCenter, hits, TrackableType.Planes);
 
-        _placementPoseIsValid = hits.Count > 0;
-        if(_placementPoseIsValid)
-        {
-            _placementPose = hits[0].pose;
-        }
-        if(_spawnedObject == null && _placementPoseIsValid)
-        {
-            placementIndicator.SetActive(true);
-            placementIndicator.transform.SetPositionAndRotation(_placementPose.position, _placementPose.rotation);
-        }
-        else
-        {
-            placementIndicator.SetActive(false);
-        }
-    }
+        var thisTransform = transform;
+        var pose = hits.Count > 0
+            ? hits[0].pose
+            : new Pose(thisTransform.position, thisTransform.rotation);
 
-    private void ARPlaceObject()
-    {
-        _spawnedObject = Instantiate(_arObjectToSpawn, _placementPose.position, _placementPose.rotation);
+        _spawnedObject = Instantiate(prefab, pose.position, pose.rotation);
+        _spawnedObject.AddComponent<LeanDragTranslate>();
+        _spawnedObject.AddComponent<LeanPinchScale>();
+        _spawnedObject.AddComponent<LeanTwistRotateAxis>();
+
         approveButton.gameObject.SetActive(true);
-        _state = ObjectPlacementControllerState.TranslatingObject;
     }
 }
