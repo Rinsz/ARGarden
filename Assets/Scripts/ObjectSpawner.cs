@@ -6,7 +6,7 @@ using Lean.Touch;
 using UnityEngine.XR.ARFoundation;
 using UnityEngine.XR.ARSubsystems;
 
-public class VrObjectSpawner : MonoBehaviour
+public class ObjectSpawner : MonoBehaviour
 {
     [SerializeField] private GameObject[] objectsToSpawn;
     [SerializeField] private Button[] buttons;
