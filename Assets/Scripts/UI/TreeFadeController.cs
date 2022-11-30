@@ -14,7 +14,6 @@ public class TreeFadeController : MonoBehaviour
 
     private void Start()
     {
-        Debug.Log(gameObject.name);
         children = transform.GetComponentsInChildrenNonRecursive<TreeFadeControllerChild>()
             .Where(e => e.Fader)
             .ToArray();
