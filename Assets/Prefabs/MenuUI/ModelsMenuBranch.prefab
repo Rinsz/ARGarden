@@ -307,7 +307,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 6935864185076004673}
         m_TargetAssemblyTypeName: BranchButton, Assembly-CSharp
-        m_MethodName: RenderButtons
+        m_MethodName: Fade
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

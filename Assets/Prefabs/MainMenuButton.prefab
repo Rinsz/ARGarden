@@ -230,7 +230,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 3809409301833217198}
         m_TargetAssemblyTypeName: BranchButton, Assembly-CSharp
-        m_MethodName: RenderButtons
+        m_MethodName: Fade
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -257,11 +257,6 @@ MonoBehaviour:
   - {fileID: 6552736278902151199, guid: 2a1343461a067f3459279f7e15ab6c8f, type: 3}
   - {fileID: 6552736278902151199, guid: 2a1343461a067f3459279f7e15ab6c8f, type: 3}
   - {fileID: 6552736278902151199, guid: 2a1343461a067f3459279f7e15ab6c8f, type: 3}
-  buttons:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
   scalingMode: 0
   referenceButtonSize: {x: 150, y: 150}
   referenceScreenSize: {x: 1920, y: 886.1539}
