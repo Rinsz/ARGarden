@@ -25,7 +25,8 @@ namespace Models
 
         public void DownloadContent()
         {
-            var metasRequest = UnityWebRequest.Get("https://localhost:7051/api/models/metas");
+            var metasUrl = ApiUrlProvider.GetMetasUrl();
+            var metasRequest = UnityWebRequest.Get(metasUrl);
             using var certHandler = new StubCertHandler();
             metasRequest.certificateHandler = certHandler;
             var requestResult = metasRequest.SendWebRequest();
@@ -44,6 +45,7 @@ namespace Models
                 var modelDownloadCard = rawObject.GetComponent<ModelDownloadCard>();
                 modelDownloadCard.meta = meta;
                 modelDownloadCard.modelName.text = meta.Name;
+                modelDownloadCard.SetState();
                 createdCards.Add(rawObject);
                 LoadImage(meta, modelDownloadCard);
             }
@@ -51,8 +53,8 @@ namespace Models
 
         private static void LoadImage(ModelMeta meta, ModelDownloadCard modelDownloadCard)
         {
-            var imageRequest = UnityWebRequestTexture
-                .GetTexture($"https://localhost:7051/api/models/images/{meta.Id}/{meta.Version}");
+            var imageUrl = ApiUrlProvider.GetImageUrl(meta.Id, meta.Version);
+            var imageRequest = UnityWebRequestTexture.GetTexture(imageUrl);
             using var ch = new StubCertHandler();
             imageRequest.certificateHandler = ch;
             var imageRequestResult = imageRequest.SendWebRequest();
