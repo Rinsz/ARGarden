@@ -8,15 +8,17 @@ using static UnityConstants;
 
 namespace Models.Loaders
 {
-    internal class IncludedModelsLoader : ScriptableObject
+    internal class IncludedModelsLoader
     {
         private readonly JsonSerializer serializer;
         private readonly GameObject modelSelectionMenu;
+        private readonly ObjectSpawnController leanObjectsSpawnController;
 
-        public IncludedModelsLoader(JsonSerializer serializer, GameObject modelSelectionMenu)
+        public IncludedModelsLoader(JsonSerializer serializer, GameObject modelSelectionMenu, ObjectSpawnController leanObjectsSpawnController)
         {
             this.serializer = serializer;
             this.modelSelectionMenu = modelSelectionMenu;
+            this.leanObjectsSpawnController = leanObjectsSpawnController;
         }
 
         public IEnumerable<ModelCardDescriptor> Load(ModelGroup modelGroup)
@@ -44,7 +46,7 @@ namespace Models.Loaders
         private void SelectModelAction(ModelMeta meta)
         {
             var modelPrefab = Resources.Load($"{IncludedPrefabsPath}/{meta.Id}");
-            Instantiate(modelPrefab);
+            leanObjectsSpawnController.SpawnObject((GameObject) modelPrefab);
             this.modelSelectionMenu.SetActive(false);
         }
     }

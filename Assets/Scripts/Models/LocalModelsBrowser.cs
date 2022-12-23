@@ -16,6 +16,8 @@ namespace Models
         public GameObject modelSelectionMenu;
         public Button backButton;
 
+        public ObjectSpawnController objectSpawnController;
+
         private List<ModelGroupCard> modelGroups;
 
         private readonly List<GameObject> createdCards = new();
@@ -26,7 +28,7 @@ namespace Models
 
         public void ShowGroupContent(ModelGroupCard modelGroupCard)
         {
-            DisableGroups();
+            SetGroupsActive(false);
             backButton.gameObject.SetActive(true);
 
             var modelGroupValue = modelGroupCard.modelGroup;
@@ -44,8 +46,9 @@ namespace Models
         {
             favorites = PlayerPrefs.GetString(FavoritesKey).Split(',').ToHashSet();
             var serializer = JsonSerializer.Create(new JsonSerializerSettings { Culture = CultureInfo.InvariantCulture });
-            includedModelsLoader = new(serializer, modelSelectionMenu);
-            assetBundleModelsLoader = new(serializer, modelSelectionMenu);
+
+            includedModelsLoader = new(serializer, modelSelectionMenu, objectSpawnController);
+            assetBundleModelsLoader = new(serializer, modelSelectionMenu, objectSpawnController);
         }
 
         private void Awake()
@@ -54,17 +57,17 @@ namespace Models
             backButton.onClick.AddListener(() =>
             {
                 ClearModelCards();
-                EnableGroups();
+                SetGroupsActive(true);
                 backButton.gameObject.SetActive(false);
             });
         }
 
-        private void OnEnable() => EnableGroups();
+        private void OnEnable() => SetGroupsActive(true);
 
         private void OnDisable()
         {
             ClearModelCards();
-            DisableGroups();
+            SetGroupsActive(false);
             backButton.gameObject.SetActive(false);
         }
 
@@ -93,17 +96,11 @@ namespace Models
             createdCards.Clear();
         }
 
-        private void DisableGroups()
-        {
-            foreach (var groupCard in modelGroups)
-                groupCard.gameObject.SetActive(false);
-        }
-
-        private void EnableGroups()
+        private void SetGroupsActive(bool isActive)
         {
             if (modelGroups.Count <= 0) return;
-            foreach (var group in modelGroups)
-                group.gameObject.SetActive(true);
+            foreach (var groupCard in modelGroups)
+                groupCard.gameObject.SetActive(isActive);
         }
     }
 }

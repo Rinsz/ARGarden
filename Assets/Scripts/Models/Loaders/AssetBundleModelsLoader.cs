@@ -9,15 +9,17 @@ using static UnityConstants;
 
 namespace Models.Loaders
 {
-    internal class AssetBundleModelsLoader : ScriptableObject
+    internal class AssetBundleModelsLoader
     {
         private readonly JsonSerializer serializer;
         private readonly GameObject modelSelectionMenu;
+        private readonly ObjectSpawnController leanObjectsSpawnController;
 
-        public AssetBundleModelsLoader(JsonSerializer serializer, GameObject modelSelectionMenu)
+        public AssetBundleModelsLoader(JsonSerializer serializer, GameObject modelSelectionMenu, ObjectSpawnController leanObjectsSpawnController)
         {
             this.serializer = serializer;
             this.modelSelectionMenu = modelSelectionMenu;
+            this.leanObjectsSpawnController = leanObjectsSpawnController;
         }
 
         public IEnumerable<ModelCardDescriptor> Load(ModelGroup group)
@@ -76,7 +78,7 @@ namespace Models.Loaders
             var bundle = bundleRequest.assetBundle;
             var obj = bundle.LoadAsset<GameObject>(meta.Id.ToString());
 
-            Instantiate(obj);
+            leanObjectsSpawnController.SpawnObject(obj);
             bundle.UnloadAsync(false);
             this.modelSelectionMenu.SetActive(false);
         }
