@@ -12,14 +12,12 @@ namespace Models.Loaders
     internal class AssetBundleModelsLoader
     {
         private readonly JsonSerializer serializer;
-        private readonly GameObject modelSelectionMenu;
-        private readonly ObjectSpawnController leanObjectsSpawnController;
+        private readonly ObjectSpawnController objectsSpawnController;
 
-        public AssetBundleModelsLoader(JsonSerializer serializer, GameObject modelSelectionMenu, ObjectSpawnController leanObjectsSpawnController)
+        public AssetBundleModelsLoader(JsonSerializer serializer, ObjectSpawnController objectsSpawnController)
         {
             this.serializer = serializer;
-            this.modelSelectionMenu = modelSelectionMenu;
-            this.leanObjectsSpawnController = leanObjectsSpawnController;
+            this.objectsSpawnController = objectsSpawnController;
         }
 
         public IEnumerable<ModelCardDescriptor> Load(ModelGroup group)
@@ -78,9 +76,8 @@ namespace Models.Loaders
             var bundle = bundleRequest.assetBundle;
             var obj = bundle.LoadAsset<GameObject>(meta.Id.ToString());
 
-            leanObjectsSpawnController.SpawnObject(obj);
+            objectsSpawnController.SpawnObject(obj);
             bundle.UnloadAsync(false);
-            this.modelSelectionMenu.SetActive(false);
         }
     }
 }

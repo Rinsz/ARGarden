@@ -2,8 +2,8 @@ namespace ObjectsHandling
 {
     public enum TransformControllerMode
     {
-        Position,
-        Rotation,
+        Translate,
+        Rotate,
         Scale
     }
 }
