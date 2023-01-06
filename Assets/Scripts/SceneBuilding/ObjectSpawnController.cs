@@ -12,7 +12,7 @@ public class ObjectSpawnController : MonoBehaviour
 
     [SerializeField] private ObjectsTransformController objectsTransformController;
 
-    public UnityEvent<GameObject> OnSpawned = new();
+    public UnityEvent<TranslatedObject> OnSpawned = new();
 
     private void Start()
     {
@@ -42,10 +42,10 @@ public class ObjectSpawnController : MonoBehaviour
         var obj = Object.Instantiate(prefab, position, rotation);
         objectsTransformController.AddChild(obj.transform);
 
-        obj.AddComponent<TranslatedObject>();
-        var outline = obj.AddComponent<Outline>();
+        var translatedObject = obj.AddComponent<TranslatedObject>();
+        var outline = obj.GetComponent<Outline>();
         outline.OutlineColor = new Color(117, 180, 236);
         outline.OutlineWidth = 5;
-        OnSpawned.Invoke(obj);
+        OnSpawned.Invoke(translatedObject);
     }
 }

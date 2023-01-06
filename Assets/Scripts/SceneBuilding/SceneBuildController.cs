@@ -9,7 +9,7 @@ namespace ObjectsHandling
     public class SceneBuildController : MonoBehaviour
     {
         private SceneBuildControllerState state = SceneBuildControllerState.Default;
-        private HashSet<GameObject> objectsToDestroy = new();
+        private HashSet<TranslatedObject> handledObjects = new();
 
         [SerializeField] private ObjectsTransformController objectsTransformController;
         [SerializeField] private ControlButtonsManager controlButtonsManager;
@@ -44,9 +44,15 @@ namespace ObjectsHandling
             {
                 if (state == SceneBuildControllerState.Delete)
                 {
-                    foreach (var objectToDestroy in objectsToDestroy)
+                    foreach (var objectToDestroy in handledObjects)
                         Destroy(objectToDestroy);
                 }
+                else
+                {
+                    foreach (var objectToDestroy in handledObjects)
+                        objectToDestroy.SetOutLineEnabled(false);
+                }
+                handledObjects.Clear();
                 objectsTransformController.ReleaseAllChildren();
                 SetState(SceneBuildControllerState.Default);
             });
@@ -56,8 +62,15 @@ namespace ObjectsHandling
                 {
                     objectsTransformController.DestroyAllChildren();
                 }
+                else if (state == SceneBuildControllerState.Delete)
+                {
+                    foreach (var obj in handledObjects)
+                        obj.gameObject.SetActive(true);
+                }
                 else
                     objectsTransformController.RevertAllChildren();
+
+                handledObjects.Clear();
 
                 SetState(SceneBuildControllerState.Default);
             });
@@ -66,22 +79,29 @@ namespace ObjectsHandling
 
             objectSpawnController.OnSpawned.AddListener(obj =>
             {
-                obj.GetComponent<TranslatedObject>().OnTap.AddListener(() =>
+                handledObjects.Add(obj);
+                obj.OnTap.AddListener(() =>
                 {
+                    handledObjects.Add(obj);
                     switch (state)
                     {
                         case SceneBuildControllerState.Default:
                         case SceneBuildControllerState.Create:
                             return;
                         case SceneBuildControllerState.Delete:
-                            obj.SetActive(false);
-                            objectsToDestroy.Add(obj);
+                            obj.gameObject.SetActive(false);
                             return;
                         case SceneBuildControllerState.Edit:
                             if (objectsTransformController.ContainsChild(obj.transform))
+                            {
                                 objectsTransformController.RemoveChild(obj.transform);
+                                obj.SetOutLineEnabled(false);
+                            }
                             else
+                            {
                                 objectsTransformController.AddChild(obj.transform);
+                                obj.SetOutLineEnabled(true);
+                            }
                             return;
                     }
                 });
