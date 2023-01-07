@@ -5,16 +5,21 @@ using Models.Descriptors;
 using Models.Loaders;
 using Newtonsoft.Json;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 using static UnityConstants;
 
 namespace Models
 {
-    public class LocalModelsBrowser : MonoBehaviour
+    public class LocalModelsBrowserManager : MonoBehaviour
     {
         public GameObject modelCardPrefab;
-        public GameObject modelSelectionMenu;
         public Button backButton;
+        public UnityEvent onClosedWithoutSpawn = new();
+
+        [SerializeField] private GameObject menu;
+        [SerializeField] private Transform content;
+        [SerializeField] private ObjectSpawnController objectSpawnController;
 
         private List<ModelGroupCard> modelGroups;
 
@@ -24,54 +29,49 @@ namespace Models
         private AssetBundleModelsLoader assetBundleModelsLoader;
         private HashSet<string> favorites;
 
+        public void SetMenuActive(bool active) => menu.SetActive(active);
+        
+        private void Start()
+        {
+            favorites = PlayerPrefs.GetString(FavoritesKey).Split(',').ToHashSet();
+
+            objectSpawnController.OnSpawned.AddListener(_ => SetMenuActive(false));
+        }
+
+        private void Awake()
+        {
+            var serializer = JsonSerializer.Create(new JsonSerializerSettings { Culture = CultureInfo.InvariantCulture });
+            includedModelsLoader = new(serializer, objectSpawnController);
+            assetBundleModelsLoader = new(serializer, objectSpawnController);
+            modelGroups = new List<ModelGroupCard>(content.GetComponentsInChildren<ModelGroupCard>());
+            backButton.onClick.AddListener(() =>
+            {
+                ClearModelCards();
+                SetMenuActive(false);
+                onClosedWithoutSpawn.Invoke();
+            });
+        }
+
         public void ShowGroupContent(ModelGroupCard modelGroupCard)
         {
-            DisableGroups();
+            SetGroupsActive(false);
             backButton.gameObject.SetActive(true);
 
             var modelGroupValue = modelGroupCard.modelGroup;
             var includedModels = includedModelsLoader.Load(modelGroupValue);
             var downloadedModels = assetBundleModelsLoader.Load(modelGroupValue);
-            var models = includedModels
+            var cardDescriptors = includedModels
                 .Concat(downloadedModels)
                 .OrderBy(descriptor => favorites.Contains(descriptor.Meta.Id.ToString()));
 
-            foreach (var descriptor in models)
+            foreach (var descriptor in cardDescriptors)
                 CreateModelCard(descriptor);
-        }
-
-        private void Start()
-        {
-            favorites = PlayerPrefs.GetString(FavoritesKey).Split(',').ToHashSet();
-            var serializer = JsonSerializer.Create(new JsonSerializerSettings { Culture = CultureInfo.InvariantCulture });
-            includedModelsLoader = new(serializer, modelSelectionMenu);
-            assetBundleModelsLoader = new(serializer, modelSelectionMenu);
-        }
-
-        private void Awake()
-        {
-            modelGroups = new List<ModelGroupCard>(this.GetComponentsInChildren<ModelGroupCard>());
-            backButton.onClick.AddListener(() =>
-            {
-                ClearModelCards();
-                EnableGroups();
-                backButton.gameObject.SetActive(false);
-            });
-        }
-
-        private void OnEnable() => EnableGroups();
-
-        private void OnDisable()
-        {
-            ClearModelCards();
-            DisableGroups();
-            backButton.gameObject.SetActive(false);
         }
 
         private void CreateModelCard(ModelCardDescriptor descriptor)
         {
             var (meta, image, selectAction) = descriptor;
-            var card = Instantiate(modelCardPrefab, this.transform, false);
+            var card = Instantiate(modelCardPrefab, content, false);
             var modelCard = card.GetComponent<ModelCard>();
             modelCard.modelIcon.sprite = image;
             modelCard.modelName.text = meta.Name;
@@ -93,17 +93,11 @@ namespace Models
             createdCards.Clear();
         }
 
-        private void DisableGroups()
-        {
-            foreach (var groupCard in modelGroups)
-                groupCard.gameObject.SetActive(false);
-        }
-
-        private void EnableGroups()
+        private void SetGroupsActive(bool isActive)
         {
             if (modelGroups.Count <= 0) return;
-            foreach (var group in modelGroups)
-                group.gameObject.SetActive(true);
+            foreach (var groupCard in modelGroups)
+                groupCard.gameObject.SetActive(isActive);
         }
     }
 }

@@ -11,10 +11,10 @@ public class ColorFader : MonoBehaviour
     public void Awake()
     {
         allGraphics = GetComponents<MaskableGraphic>()
-            .Concat(transform.GetComponentsInChildrenNonRecursive<MaskableGraphic>())
+            .Concat(transform.GetComponentsInChildren<MaskableGraphic>())
             .ToArray();
     }
-
+ 
     public IEnumerable Fade(float fadeTimeSeconds)
     {
         var startTime = Time.time;
