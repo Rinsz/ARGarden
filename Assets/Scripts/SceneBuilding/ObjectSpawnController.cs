@@ -17,8 +17,8 @@ public class ObjectSpawnController : MonoBehaviour
 
     private void Start()
     {
-        this.arRaycastManager = FindObjectOfType<ARRaycastManager>();
-        NullComponentChecker.LogIfComponentNull(this.arRaycastManager,
+        arRaycastManager = FindObjectOfType<ARRaycastManager>();
+        arRaycastManager.LogIfComponentNull(
             $"{nameof(ARRaycastManager)} must be created to use {nameof(ObjectSpawnController)}");
     }
 

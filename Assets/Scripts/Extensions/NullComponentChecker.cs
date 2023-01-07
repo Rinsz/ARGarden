@@ -4,7 +4,7 @@ namespace Extensions
 {
     public static class NullComponentChecker
     {
-        public static void LogIfComponentNull(Component component, string message)
+        public static void LogIfComponentNull(this Component component, string message)
         {
             if (!component)
             {
