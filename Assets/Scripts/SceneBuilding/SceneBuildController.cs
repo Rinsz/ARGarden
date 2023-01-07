@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Models;
+using ObjectsHandling.SceneBuilderStates;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
@@ -8,7 +9,7 @@ namespace ObjectsHandling
 {
     public class SceneBuildController : MonoBehaviour
     {
-        private SceneBuildControllerState state = SceneBuildControllerState.Default;
+        private StateMachine<SceneBuildControllerState, SceneBuilderState> stateMachine;
         private HashSet<TranslatedObject> handledObjects = new();
 
         [SerializeField] private ObjectsTransformController objectsTransformController;
@@ -23,55 +24,37 @@ namespace ObjectsHandling
 
         public void SetState(SceneBuildControllerState state)
         {
-            this.state = state;
-
-            if (state == SceneBuildControllerState.Delete)
-                controlButtonsManager.SetDecisionButtons();
-            else if (state == SceneBuildControllerState.Create)
-            {
-                modelsBrowserManager.SetMenuActive(true);
-                controlButtonsManager.SetAllButtons(true);
-            }
-            else
-                controlButtonsManager.SetAllButtons(state != SceneBuildControllerState.Default);
-
+            stateMachine.SetState(state);
+            stateMachine.CurrentState.StartState(handledObjects);
             OnStateChanged.Invoke(state);
         }
 
         private void Start()
         {
+            stateMachine = new StateMachine<SceneBuildControllerState, SceneBuilderState>
+            (
+                new Dictionary<SceneBuildControllerState, SceneBuilderState>
+                {
+                    [SceneBuildControllerState.Default] = new DefaultState(),
+                    [SceneBuildControllerState.Create] = new CreateState(
+                        modelsBrowserManager,
+                        controlButtonsManager,
+                        objectsTransformController),
+                    [SceneBuildControllerState.Edit] = new EditState(objectsTransformController, controlButtonsManager),
+                    [SceneBuildControllerState.Delete] = new DeleteState(controlButtonsManager)
+                },
+                SceneBuildControllerState.Default
+            );
+
             approveButton.onClick.AddListener(() =>
             {
-                if (state == SceneBuildControllerState.Delete)
-                {
-                    foreach (var objectToDestroy in handledObjects)
-                        Destroy(objectToDestroy);
-                }
-                else
-                {
-                    foreach (var objectToDestroy in handledObjects)
-                        objectToDestroy.SetOutLineEnabled(false);
-                }
-                handledObjects.Clear();
+                stateMachine.CurrentState.Approve(handledObjects);
                 objectsTransformController.ReleaseAllChildren();
                 SetState(SceneBuildControllerState.Default);
             });
             revertButton.onClick.AddListener(() =>
             {
-                if (state == SceneBuildControllerState.Create)
-                {
-                    objectsTransformController.DestroyAllChildren();
-                }
-                else if (state == SceneBuildControllerState.Delete)
-                {
-                    foreach (var obj in handledObjects)
-                        obj.gameObject.SetActive(true);
-                }
-                else
-                    objectsTransformController.RevertAllChildren();
-
-                handledObjects.Clear();
-
+                stateMachine.CurrentState.Revert(handledObjects);
                 SetState(SceneBuildControllerState.Default);
             });
 
@@ -80,30 +63,11 @@ namespace ObjectsHandling
             objectSpawnController.OnSpawned.AddListener(obj =>
             {
                 handledObjects.Add(obj);
+                controlButtonsManager.SetAllButtons(true);
                 obj.OnTap.AddListener(() =>
                 {
                     handledObjects.Add(obj);
-                    switch (state)
-                    {
-                        case SceneBuildControllerState.Default:
-                        case SceneBuildControllerState.Create:
-                            return;
-                        case SceneBuildControllerState.Delete:
-                            obj.gameObject.SetActive(false);
-                            return;
-                        case SceneBuildControllerState.Edit:
-                            if (objectsTransformController.ContainsChild(obj.transform))
-                            {
-                                objectsTransformController.RemoveChild(obj.transform);
-                                obj.SetOutLineEnabled(false);
-                            }
-                            else
-                            {
-                                objectsTransformController.AddChild(obj.transform);
-                                obj.SetOutLineEnabled(true);
-                            }
-                            return;
-                    }
+                    stateMachine.CurrentState.OnObjectTap(obj);
                 });
             });
         }
