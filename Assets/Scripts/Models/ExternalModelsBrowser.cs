@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using JetBrains.Annotations;
 using Models.Descriptors;
 using Newtonsoft.Json;
 using UnityEngine;
@@ -9,7 +11,7 @@ namespace Models
 {
     public class ExternalModelsBrowser : MonoBehaviour
     {
-        public GameObject ModelDownloadCardPrefab;
+        public GameObject modelDownloadCardPrefab;
 
         private List<ModelGroupCard> modelGroups;
 
@@ -23,13 +25,22 @@ namespace Models
                 Destroy(card);
         }
 
-        public void DownloadContent()
+        public void DownloadContent([CanBeNull] ModelFilters filters = null)
         {
-            var metasUrl = ApiUrlProvider.GetMetasUrl();
+            var group = (ModelGroup?)filters?.groupField?.value;
+            var nameFilter = filters?.nameInputField?.text;
+
+            var metasUrl = ApiUrlProvider.GetMetasUrl(group, nameFilter);
             var metasRequest = UnityWebRequest.Get(metasUrl);
             using var certHandler = new StubCertHandler();
             metasRequest.certificateHandler = certHandler;
             var requestResult = metasRequest.SendWebRequest();
+            if (createdCards.Any())
+            {
+                createdCards.ForEach(Destroy);
+                createdCards.Clear();
+            }
+
             requestResult.completed += _ => CreateCards(requestResult.webRequest.downloadHandler.text);
         }
 
@@ -41,7 +52,7 @@ namespace Models
 
             foreach (var meta in metas)
             {
-                var rawObject = Instantiate(ModelDownloadCardPrefab, this.transform, false);
+                var rawObject = Instantiate(modelDownloadCardPrefab, this.transform, false);
                 var modelDownloadCard = rawObject.GetComponent<ModelDownloadCard>();
                 modelDownloadCard.meta = meta;
                 modelDownloadCard.modelName.text = meta.Name;
