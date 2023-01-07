@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Extensions;
+using UI;
 using UnityEngine;
 
 public class TreeFadeController : MonoBehaviour

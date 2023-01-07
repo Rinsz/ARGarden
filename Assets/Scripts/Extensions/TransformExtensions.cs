@@ -10,6 +10,7 @@ namespace Extensions
             return Enumerable.Range(0, transform.childCount)
                 .Select(transform.GetChild)
                 .Select(child => child.GetComponent<T>())
+                .Where(component => component)
                 .ToArray();
         }
     }

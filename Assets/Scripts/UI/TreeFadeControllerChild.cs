@@ -1,7 +1,7 @@
 using JetBrains.Annotations;
 using UnityEngine;
 
-namespace Extensions
+namespace UI
 {
     [RequireComponent(typeof(ColorFader))]
     public class TreeFadeControllerChild : MonoBehaviour
@@ -11,7 +11,7 @@ namespace Extensions
         [CanBeNull]
         public TreeFadeController TreeFadeControllerComponent { get; private set; }
 
-        private void Start()
+        private void Awake()
         {
             Fader = GetComponent<ColorFader>();
             TreeFadeControllerComponent = GetComponent<TreeFadeController>();
