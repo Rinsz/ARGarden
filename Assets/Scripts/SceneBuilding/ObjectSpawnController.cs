@@ -11,13 +11,14 @@ public class ObjectSpawnController : MonoBehaviour
     private ARRaycastManager arRaycastManager;
 
     [SerializeField] private ObjectsTransformController objectsTransformController;
+    [SerializeField] private Color handledObjectColor = Color.white;
 
     public UnityEvent<TranslatedObject> OnSpawned = new();
 
     private void Start()
     {
-        arRaycastManager = FindObjectOfType<ARRaycastManager>();
-        NullComponentChecker.LogIfComponentNull(arRaycastManager,
+        this.arRaycastManager = FindObjectOfType<ARRaycastManager>();
+        NullComponentChecker.LogIfComponentNull(this.arRaycastManager,
             $"{nameof(ARRaycastManager)} must be created to use {nameof(ObjectSpawnController)}");
     }
 
@@ -44,7 +45,7 @@ public class ObjectSpawnController : MonoBehaviour
 
         var translatedObject = obj.AddComponent<TranslatedObject>();
         var outline = obj.GetComponent<Outline>();
-        outline.OutlineColor = new Color(117, 180, 236);
+        outline.OutlineColor = handledObjectColor;
         outline.OutlineWidth = 5;
         OnSpawned.Invoke(translatedObject);
     }

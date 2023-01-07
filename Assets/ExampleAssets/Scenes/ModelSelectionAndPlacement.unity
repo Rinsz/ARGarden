@@ -1880,6 +1880,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   objectsTransformController: {fileID: 1909696562}
+  handledObjectColor: {r: 0.3820755, g: 0.7839547, b: 1, a: 1}
   OnSpawned:
     m_PersistentCalls:
       m_Calls: []
