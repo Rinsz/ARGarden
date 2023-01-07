@@ -48,7 +48,7 @@ namespace Models
         {
             using var tr = new StringReader(metasJson);
             using var jtr = new JsonTextReader(tr);
-            var metas = JsonSerializer.CreateDefault().Deserialize<List<ModelMeta>>(jtr);
+            var metas = JsonSerializer.CreateDefault().Deserialize<List<ModelMeta>>(jtr) ?? new();
 
             foreach (var meta in metas)
             {
