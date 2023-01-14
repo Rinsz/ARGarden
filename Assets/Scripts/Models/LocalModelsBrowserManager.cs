@@ -62,7 +62,8 @@ namespace Models
             var downloadedModels = assetBundleModelsLoader.Load(modelGroupValue);
             var cardDescriptors = includedModels
                 .Concat(downloadedModels)
-                .OrderBy(descriptor => favorites.Contains(descriptor.Meta.Id.ToString()));
+                .OrderBy(descriptor => favorites.Contains(descriptor.Meta.Id.ToString()))
+                .ThenBy(descriptor => descriptor.Meta.Name);
 
             foreach (var descriptor in cardDescriptors)
                 CreateModelCard(descriptor);

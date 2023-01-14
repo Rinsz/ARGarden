@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using JetBrains.Annotations;
 using Models.Descriptors;
+using Models.Loaders;
 using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -16,6 +18,7 @@ namespace Models
         private List<ModelGroupCard> modelGroups;
 
         private readonly List<GameObject> createdCards = new();
+        private readonly AssetBundleModelsLoader bundleModelsLoader = new(JsonSerializer.CreateDefault(), null);
 
         private void OnEnable() => DownloadContent();
 
@@ -27,19 +30,25 @@ namespace Models
 
         public void DownloadContent([CanBeNull] ModelFilters filters = null)
         {
+            if (createdCards.Any())
+            {
+                createdCards.ForEach(Destroy);
+                createdCards.Clear();
+            }
+
             var group = (ModelGroup?)filters?.groupField?.value;
             var nameFilter = filters?.nameInputField?.text;
+            if (filters?.showOnlyDownloaded?.isOn ?? false)
+            {
+                LoadDownloadedCards(group ?? ModelGroup.Unknown, nameFilter);
+                return;
+            }
 
             var metasUrl = ApiUrlProvider.GetMetasUrl(group, nameFilter);
             var metasRequest = UnityWebRequest.Get(metasUrl);
             using var certHandler = new StubCertHandler();
             metasRequest.certificateHandler = certHandler;
             var requestResult = metasRequest.SendWebRequest();
-            if (createdCards.Any())
-            {
-                createdCards.ForEach(Destroy);
-                createdCards.Clear();
-            }
 
             requestResult.completed += _ => CreateCards(requestResult.webRequest.downloadHandler.text);
         }
@@ -60,6 +69,31 @@ namespace Models
                 createdCards.Add(rawObject);
                 LoadImage(meta, modelDownloadCard);
             }
+        }
+
+        private void LoadDownloadedCards(ModelGroup group, string nameFilter)
+        {
+            var modelCardDescriptors = bundleModelsLoader
+                .Load(group)
+                .Where(descriptor => string.IsNullOrWhiteSpace(nameFilter) ||
+                                     descriptor.Meta.Name.Contains(nameFilter, StringComparison.InvariantCultureIgnoreCase))
+                .OrderBy(descriptor => descriptor.Meta.Name);
+
+            foreach (var modelCardDescriptor in modelCardDescriptors)
+                CreateCard(modelCardDescriptor);
+        }
+
+        private void CreateCard(ModelCardDescriptor descriptor)
+        {
+            var (meta, image, selectAction) = descriptor;
+            var card = Instantiate(modelDownloadCardPrefab, this.transform, false);
+            var modelCard = card.GetComponent<ModelDownloadCard>();
+            modelCard.meta = meta;
+            modelCard.modelName.text = meta.Name;
+            modelCard.modelIcon.sprite = image;
+            modelCard.SetState();
+
+            createdCards.Add(card);
         }
 
         private static void LoadImage(ModelMeta meta, ModelDownloadCard modelDownloadCard)
