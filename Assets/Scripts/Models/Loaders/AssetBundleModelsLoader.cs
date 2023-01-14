@@ -35,7 +35,7 @@ namespace Models.Loaders
                 if (meta == null)
                     continue;
 
-                if (meta.ModelGroup != group && meta.ModelGroup != ModelGroup.Unknown)
+                if (meta.ModelGroup != group && meta.ModelGroup != ModelGroup.Unknown && group != ModelGroup.Unknown)
                 {
                     bundle.UnloadAsync(true);
                     continue;
