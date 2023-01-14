@@ -11,12 +11,12 @@ namespace Models.Loaders
     internal class IncludedModelsLoader
     {
         private readonly JsonSerializer serializer;
-        private readonly ObjectSpawnController objectsSpawnController;
+        private readonly ObjectSpawner objectsSpawner;
 
-        public IncludedModelsLoader(JsonSerializer serializer, ObjectSpawnController objectsSpawnController)
+        public IncludedModelsLoader(JsonSerializer serializer, ObjectSpawner objectsSpawner)
         {
             this.serializer = serializer;
-            this.objectsSpawnController = objectsSpawnController;
+            this.objectsSpawner = objectsSpawner;
         }
 
         public IEnumerable<ModelCardDescriptor> Load(ModelGroup modelGroup)
@@ -44,7 +44,7 @@ namespace Models.Loaders
         private void SelectModelAction(ModelMeta meta)
         {
             var modelPrefab = Resources.Load($"{IncludedPrefabsPath}/{meta.Id}");
-            objectsSpawnController.SpawnObject((GameObject) modelPrefab);
+            objectsSpawner.SpawnObject((GameObject) modelPrefab);
         }
     }
 }

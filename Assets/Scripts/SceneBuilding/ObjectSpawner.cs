@@ -5,7 +5,7 @@ using UnityEngine.Events;
 using UnityEngine.XR.ARFoundation;
 using UnityEngine.XR.ARSubsystems;
 
-public class ObjectSpawnController : MonoBehaviour
+public class ObjectSpawner : MonoBehaviour
 {
     private Camera camera;
     private ARRaycastManager arRaycastManager;
@@ -19,7 +19,7 @@ public class ObjectSpawnController : MonoBehaviour
     {
         arRaycastManager = FindObjectOfType<ARRaycastManager>();
         arRaycastManager.LogIfComponentNull(
-            $"{nameof(ARRaycastManager)} must be created to use {nameof(ObjectSpawnController)}");
+            $"{nameof(ARRaycastManager)} must be created to use {nameof(ObjectSpawner)}");
     }
 
     public void SpawnObject(GameObject prefab)

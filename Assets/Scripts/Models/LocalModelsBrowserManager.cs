@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using Models.Descriptors;
@@ -15,13 +16,13 @@ namespace Models
     {
         public GameObject modelCardPrefab;
         public Button backButton;
+        public Button closeButton;
         public UnityEvent onClosedWithoutSpawn = new();
 
         [SerializeField] private GameObject menu;
         [SerializeField] private Transform content;
-        [SerializeField] private ObjectSpawnController objectSpawnController;
-
-        private List<ModelGroupCard> modelGroups;
+        [SerializeField] private ModelGroupCard[] groupCards;
+        [SerializeField] private ObjectSpawner objectSpawner;
 
         private readonly List<GameObject> createdCards = new();
 
@@ -35,34 +36,43 @@ namespace Models
         {
             favorites = PlayerPrefs.GetString(FavoritesKey).Split(',').ToHashSet();
 
-            objectSpawnController.OnSpawned.AddListener(_ => SetMenuActive(false));
+            objectSpawner.OnSpawned.AddListener(_ => SetMenuActive(false));
         }
 
         private void Awake()
         {
             var serializer = JsonSerializer.Create(new JsonSerializerSettings { Culture = CultureInfo.InvariantCulture });
-            includedModelsLoader = new(serializer, objectSpawnController);
-            assetBundleModelsLoader = new(serializer, objectSpawnController);
-            modelGroups = new List<ModelGroupCard>(content.GetComponentsInChildren<ModelGroupCard>());
-            backButton.onClick.AddListener(() =>
+            includedModelsLoader = new(serializer, objectSpawner);
+            assetBundleModelsLoader = new(serializer, objectSpawner);
+            closeButton.onClick.AddListener(() =>
             {
                 ClearModelCards();
                 SetMenuActive(false);
                 onClosedWithoutSpawn.Invoke();
             });
+            backButton.onClick.AddListener(() =>
+            {
+                SetGroupsActive(true);
+                ClearModelCards();
+            });
+
+            foreach (var groupCard in groupCards)
+            {
+                groupCard.OnGroupChoose.AddListener(ShowGroupContent);
+            }
         }
 
-        public void ShowGroupContent(ModelGroupCard modelGroupCard)
+        private void ShowGroupContent(ModelGroup modelGroup)
         {
             SetGroupsActive(false);
             backButton.gameObject.SetActive(true);
 
-            var modelGroupValue = modelGroupCard.modelGroup;
-            var includedModels = includedModelsLoader.Load(modelGroupValue);
-            var downloadedModels = assetBundleModelsLoader.Load(modelGroupValue);
+            var includedModels = includedModelsLoader.Load(modelGroup);
+            var downloadedModels = assetBundleModelsLoader.Load(modelGroup);
             var cardDescriptors = includedModels
                 .Concat(downloadedModels)
-                .OrderBy(descriptor => favorites.Contains(descriptor.Meta.Id.ToString()));
+                .OrderBy(descriptor => favorites.Contains(descriptor.Meta.Id.ToString()))
+                .ToArray();
 
             foreach (var descriptor in cardDescriptors)
                 CreateModelCard(descriptor);
@@ -95,8 +105,8 @@ namespace Models
 
         private void SetGroupsActive(bool isActive)
         {
-            if (modelGroups.Count <= 0) return;
-            foreach (var groupCard in modelGroups)
+            if (groupCards.Length <= 0) return;
+            foreach (var groupCard in groupCards)
                 groupCard.gameObject.SetActive(isActive);
         }
     }

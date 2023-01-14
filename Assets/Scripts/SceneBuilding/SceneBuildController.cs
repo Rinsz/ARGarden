@@ -14,7 +14,7 @@ namespace ObjectsHandling
 
         [SerializeField] private ObjectsTransformController objectsTransformController;
         [SerializeField] private ControlButtonsManager controlButtonsManager;
-        [SerializeField] private ObjectSpawnController objectSpawnController;
+        [SerializeField] private ObjectSpawner objectSpawner;
         [SerializeField] private LocalModelsBrowserManager modelsBrowserManager;
 
         [SerializeField] private Button approveButton;
@@ -60,7 +60,7 @@ namespace ObjectsHandling
 
             modelsBrowserManager.onClosedWithoutSpawn.AddListener(() => SetState(SceneBuildControllerState.Default));
 
-            objectSpawnController.OnSpawned.AddListener(obj =>
+            objectSpawner.OnSpawned.AddListener(obj =>
             {
                 handledObjects.Add(obj);
                 controlButtonsManager.SetAllButtons(true);
