@@ -22,7 +22,7 @@ namespace Models.Loaders
 
         public IEnumerable<ModelCardDescriptor> Load(ModelGroup group)
         {
-            var streamingAssetsPath = Application.streamingAssetsPath;
+            var streamingAssetsPath = Path.Combine(Application.persistentDataPath, "cachedBundles");
             var files = new DirectoryInfo(streamingAssetsPath).GetFiles();
             var loadedBundles = files
                 .Where(file => file.Extension == Unity3dExtension)
@@ -35,7 +35,7 @@ namespace Models.Loaders
                 if (meta == null)
                     continue;
 
-                if (meta.ModelGroup != group && meta.ModelGroup != ModelGroup.Unknown)
+                if (meta.ModelGroup != group && meta.ModelGroup != ModelGroup.Unknown && group != ModelGroup.Unknown)
                 {
                     bundle.UnloadAsync(true);
                     continue;
@@ -70,7 +70,7 @@ namespace Models.Loaders
         
         private void SelectBundleAction(ModelMeta meta)
         {
-            using var fs = File.OpenRead(Path.Combine(Application.streamingAssetsPath, $"{meta.Id}{Unity3dExtension}"));
+            using var fs = File.OpenRead(Path.Combine(Application.persistentDataPath, "cachedBundles", $"{meta.Id}{Unity3dExtension}"));
             var bundleRequest = AssetBundle.LoadFromStreamAsync(fs);
 
             var bundle = bundleRequest.assetBundle;

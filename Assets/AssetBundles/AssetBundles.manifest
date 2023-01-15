@@ -1,7 +1,16 @@
 ManifestFileVersion: 0
-CRC: 903851032
+CRC: 1462166631
 AssetBundleManifest:
   AssetBundleInfos:
     Info_0:
       Name: content/externalmodels
+      Dependencies: {}
+    Info_1:
+      Name: content/server0
+      Dependencies: {}
+    Info_2:
+      Name: content/server1
+      Dependencies: {}
+    Info_3:
+      Name: content/server2
       Dependencies: {}
