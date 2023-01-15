@@ -9,7 +9,7 @@ namespace ObjectsHandling
 {
     public class SceneBuildController : MonoBehaviour
     {
-        private static StateMachine<SceneBuildControllerState, SceneBuilderState> stateMachine;
+        private StateMachine<SceneBuildControllerState, SceneBuilderState> stateMachine;
         private HashSet<TranslatedObject> handledObjects = new();
 
         [SerializeField] private ObjectsTransformController objectsTransformController;
