@@ -6,9 +6,10 @@ using static UnityConstants;
 
 namespace Models.Descriptors
 {
+    [RequireComponent(typeof(Button))]
     public class ModelCard : MonoBehaviour
     {
-        public Button selectButton;
+        [HideInInspector] public Button selectButton;
         public Button favoriteButton;
         public Image modelIcon;
         public TMP_Text modelName;
@@ -29,6 +30,11 @@ namespace Models.Descriptors
             }
 
             PlayerPrefs.SetString(FavoritesKey, string.Join(",", favorites));
+        }
+
+        private void Awake()
+        {
+            selectButton = GetComponent<Button>();
         }
     }
 }

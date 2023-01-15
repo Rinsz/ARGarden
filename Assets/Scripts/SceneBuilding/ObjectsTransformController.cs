@@ -31,7 +31,7 @@ public class ObjectsTransformController : MonoBehaviour
         child.parent = transform;
     }
 
-    public void RemoveChild(Transform child)
+    public void ReleaseChild(Transform child)
     {
         if (!childrenToStartPositions.Remove(child))
         {
@@ -81,7 +81,7 @@ public class ObjectsTransformController : MonoBehaviour
 
     public bool ContainsChild(Transform child) => childrenToStartPositions.ContainsKey(child);
 
-    public void SetMode(TransformControllerMode mode)
+    private void SetMode(TransformControllerMode mode)
     {
         SetEnabledLeanComponents(Mode, false);
         Mode = mode;
@@ -95,7 +95,7 @@ public class ObjectsTransformController : MonoBehaviour
             linkedChild.Key.position -= positionDelta;
     }
 
-    private void SetEnabledLeanComponents(TransformControllerMode mode, bool enables)
+    private void SetEnabledLeanComponents(TransformControllerMode mode, bool enable)
     {
         if (!componentsByMode.ContainsKey(mode))
         {
@@ -104,7 +104,7 @@ public class ObjectsTransformController : MonoBehaviour
         }
 
         foreach (var component in componentsByMode[mode])
-            component.enabled = enables;
+            component.enabled = enable;
     }
 
     private void Start()
