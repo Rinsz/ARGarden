@@ -43,6 +43,7 @@ namespace Models.Loaders
         
         private void SelectModelAction(ModelMeta meta)
         {
+            Debug.Log("a " + meta.Id);
             var modelPrefab = Resources.Load($"{IncludedPrefabsPath}/{meta.Id}");
             objectsSpawner.SpawnObject((GameObject) modelPrefab);
         }

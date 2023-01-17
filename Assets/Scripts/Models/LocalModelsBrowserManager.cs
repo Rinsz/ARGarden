@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using Models.Descriptors;
@@ -55,7 +54,6 @@ namespace Models
                 SetGroupsActive(true);
                 ClearModelCards();
             });
-
             foreach (var groupCard in groupCards)
             {
                 groupCard.OnGroupChoose.AddListener(ShowGroupContent);
@@ -67,8 +65,10 @@ namespace Models
             SetGroupsActive(false);
             backButton.gameObject.SetActive(true);
 
-            var includedModels = includedModelsLoader.Load(modelGroup);
-            var downloadedModels = assetBundleModelsLoader.Load(modelGroup);
+            var includedModels = includedModelsLoader.Load(modelGroup).ToArray();
+            var downloadedModels = assetBundleModelsLoader.Load(modelGroup).ToArray();
+            Debug.Log(includedModels.Length);
+            Debug.Log(downloadedModels.Length);
             var cardDescriptors = includedModels
                 .Concat(downloadedModels)
                 .OrderBy(descriptor => favorites.Contains(descriptor.Meta.Id.ToString()))
@@ -86,6 +86,7 @@ namespace Models
             modelCard.modelIcon.sprite = image;
             modelCard.modelName.text = meta.Name;
             modelCard.meta = meta;
+            Debug.Log("b " + meta.Name);
             modelCard.selectButton.onClick.AddListener(selectAction);
             modelCard.favoriteButton.onClick.AddListener(() => modelCard.Favorite(ref favorites));
 

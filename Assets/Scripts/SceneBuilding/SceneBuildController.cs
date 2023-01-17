@@ -50,6 +50,7 @@ namespace ObjectsHandling
             {
                 stateMachine.CurrentState.Approve(handledObjects);
                 objectsTransformController.ReleaseAllChildren();
+                controlButtonsManager.SetAllButtons(false);
                 SetState(SceneBuildControllerState.Default);
             });
             revertButton.onClick.AddListener(() =>

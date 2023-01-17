@@ -1,9 +1,9 @@
 ﻿using System.IO;
+using Models.External;
 using Newtonsoft.Json;
 using TMPro;
 using UI;
 using UnityEngine;
-using UnityEngine.Networking;
 using UnityEngine.UI;
 using static UnityConstants;
 
@@ -18,11 +18,9 @@ namespace Models.Descriptors
         public Button deleteButton;
         internal ModelMeta meta;
 
-        private static string CachePath => Path.Combine(Application.persistentDataPath, "cachedBundles");
-
         internal void SetState()
         {
-            var cachePath = CachePath;
+            var cachePath = CachedBundlesPath;
             var bundlePath = Path.Combine(cachePath, $"{meta.Id}{Unity3dExtension}");
             var metaPath = Path.Combine(cachePath, $"{meta.Id}.json");
 
@@ -38,16 +36,11 @@ namespace Models.Descriptors
                 Debug.Log("Cache is not ready.");
             }
 
-            var bundleUrl = ApiUrlProvider.GetBundleUrl(meta.Id, meta.Version);
-            var bundleRequest = UnityWebRequest.Get(bundleUrl);
-            using var certHandler = new StubCertHandler();
-            bundleRequest.certificateHandler = certHandler;
-            var requestResult = bundleRequest.SendWebRequest();
+            var requestResult = ApiClient.SendRequest(ApiUrlProvider.GetBundleUrl(meta.Id, meta.Version));
             downloadBar.RunLoader(requestResult);
-
             requestResult.completed += _ =>
             {
-                var cachePath = CachePath;
+                var cachePath = CachedBundlesPath;
                 if (!Directory.Exists(cachePath))
                     Directory.CreateDirectory(cachePath);
                 var bytes = requestResult.webRequest.downloadHandler.data;
@@ -67,7 +60,7 @@ namespace Models.Descriptors
 
         public void Delete()
         {
-            var cachePath = CachePath;
+            var cachePath = CachedBundlesPath;
             var bundlePath = Path.Combine(cachePath, $"{meta.Id}{Unity3dExtension}");
             if (File.Exists(bundlePath))
                 File.Delete(bundlePath);
@@ -78,12 +71,6 @@ namespace Models.Descriptors
             
             downloadButton.gameObject.SetActive(true);
             deleteButton.gameObject.SetActive(false);
-        }
-
-        // TODO Issue cert for api and remove stub
-        private class StubCertHandler : CertificateHandler
-        {
-            protected override bool ValidateCertificate(byte[] certificateData) => true;
         }
     }
 }

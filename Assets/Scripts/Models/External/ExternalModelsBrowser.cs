@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using JetBrains.Annotations;
 using Models.Descriptors;
+using Models.External;
 using Models.Loaders;
 using Newtonsoft.Json;
 using UnityEngine;
@@ -38,26 +38,23 @@ namespace Models
 
             var group = (ModelGroup?)filters?.groupField?.value;
             var nameFilter = filters?.nameInputField?.text;
-            if (filters?.showOnlyDownloaded?.isOn ?? false)
+            if (filters?.showOnlyDownloaded?.isOn == true)
             {
                 LoadDownloadedCards(group ?? ModelGroup.Unknown, nameFilter);
                 return;
             }
 
-            var metasUrl = ApiUrlProvider.GetMetasUrl(group, nameFilter);
-            var metasRequest = UnityWebRequest.Get(metasUrl);
-            using var certHandler = new StubCertHandler();
-            metasRequest.certificateHandler = certHandler;
-            var requestResult = metasRequest.SendWebRequest();
+            /*var result = ApiClient.SendRequest(url: ApiUrlProvider.GetMetasUrl(group, nameFilter));
+            result.completed += _ => CreateCards(result.webRequest.downloadHandler.text);*/
+            CreateCards(@"[
+{
 
-            requestResult.completed += _ => CreateCards(requestResult.webRequest.downloadHandler.text);
+}]");
         }
 
         private void CreateCards(string metasJson)
         {
-            using var tr = new StringReader(metasJson);
-            using var jtr = new JsonTextReader(tr);
-            var metas = JsonSerializer.CreateDefault().Deserialize<List<ModelMeta>>(jtr) ?? new();
+            var metas = JsonConvert.DeserializeObject<List<ModelMeta>>(metasJson) ?? new();
 
             foreach (var meta in metas)
             {
@@ -73,19 +70,18 @@ namespace Models
 
         private void LoadDownloadedCards(ModelGroup group, string nameFilter)
         {
-            var modelCardDescriptors = bundleModelsLoader
-                .Load(group)
+            var modelCardDescriptors = bundleModelsLoader.Load(group)
                 .Where(descriptor => string.IsNullOrWhiteSpace(nameFilter) ||
                                      descriptor.Meta.Name.Contains(nameFilter, StringComparison.InvariantCultureIgnoreCase))
                 .OrderBy(descriptor => descriptor.Meta.Name);
 
             foreach (var modelCardDescriptor in modelCardDescriptors)
-                CreateCard(modelCardDescriptor);
+                CreateLoadedCard(modelCardDescriptor);
         }
 
-        private void CreateCard(ModelCardDescriptor descriptor)
+        private void CreateLoadedCard(ModelCardDescriptor descriptor)
         {
-            var (meta, image, selectAction) = descriptor;
+            var (meta, image, _) = descriptor;
             var card = Instantiate(modelDownloadCardPrefab, this.transform, false);
             var modelCard = card.GetComponent<ModelDownloadCard>();
             modelCard.meta = meta;
@@ -98,30 +94,15 @@ namespace Models
 
         private static void LoadImage(ModelMeta meta, ModelDownloadCard modelDownloadCard)
         {
-            var imageUrl = ApiUrlProvider.GetImageUrl(meta.Id, meta.Version);
-            var imageRequest = UnityWebRequestTexture.GetTexture(imageUrl);
-            using var ch = new StubCertHandler();
-            imageRequest.certificateHandler = ch;
-            var imageRequestResult = imageRequest.SendWebRequest();
-            imageRequestResult.completed += _ => SetImageForCard(imageRequestResult.webRequest, modelDownloadCard);
+            var requestResult = ApiClient.SendRequest(url: ApiUrlProvider.GetImageUrl(meta.Id, meta.Version));
+            requestResult.completed += _ => SetImageForCard(requestResult.webRequest, modelDownloadCard);
         }
 
         private static void SetImageForCard(UnityWebRequest webRequest, ModelDownloadCard modelDownloadCard)
         {
             var texture = DownloadHandlerTexture.GetContent(webRequest);
-            var image = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height),
+            modelDownloadCard.modelIcon.sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height),
                 new Vector2(texture.width / 2, texture.height / 2));
-
-            modelDownloadCard.modelIcon.sprite = image;
-        }
-
-        // TODO Issue cert for api and remove stub
-        private class StubCertHandler : CertificateHandler
-        {
-            protected override bool ValidateCertificate(byte[] certificateData)
-            {
-                return true;
-            }
         }
     }
 }

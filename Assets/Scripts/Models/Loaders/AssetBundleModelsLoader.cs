@@ -22,7 +22,7 @@ namespace Models.Loaders
 
         public IEnumerable<ModelCardDescriptor> Load(ModelGroup group)
         {
-            var streamingAssetsPath = Path.Combine(Application.persistentDataPath, "cachedBundles");
+            var streamingAssetsPath = CachedBundlesPath;
             var files = new DirectoryInfo(streamingAssetsPath).GetFiles();
             var loadedBundles = files
                 .Where(file => file.Extension == Unity3dExtension)
@@ -67,10 +67,10 @@ namespace Models.Loaders
             using var jsonReader = new JsonTextReader(sr);
             return serializer.Deserialize<ModelMeta>(jsonReader);
         }
-        
+
         private void SelectBundleAction(ModelMeta meta)
         {
-            using var fs = File.OpenRead(Path.Combine(Application.persistentDataPath, "cachedBundles", $"{meta.Id}{Unity3dExtension}"));
+            using var fs = File.OpenRead(Path.Combine(CachedBundlesPath, $"{meta.Id}{Unity3dExtension}"));
             var bundleRequest = AssetBundle.LoadFromStreamAsync(fs);
 
             var bundle = bundleRequest.assetBundle;

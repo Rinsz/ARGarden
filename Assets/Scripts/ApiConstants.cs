@@ -1,7 +1,7 @@
 ﻿internal static class ApiConstants
 {
 #if DEBUG
-    private const string BaseApiUrl = "https://localhost:7051/";
+    private const string BaseApiUrl = "http://argarden.ml/";
 #else
     private const string BaseApiUrl = "http://argarden.ml/";
 #endif
