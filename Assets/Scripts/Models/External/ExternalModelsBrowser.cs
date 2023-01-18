@@ -44,12 +44,8 @@ namespace Models
                 return;
             }
 
-            /*var result = ApiClient.SendRequest(url: ApiUrlProvider.GetMetasUrl(group, nameFilter));
-            result.completed += _ => CreateCards(result.webRequest.downloadHandler.text);*/
-            CreateCards(@"[
-{
-
-}]");
+            var result = ApiClient.SendRequest(url: ApiUrlProvider.GetMetasUrl(group, nameFilter));
+            result.completed += _ => CreateCards(result.webRequest.downloadHandler.text);
         }
 
         private void CreateCards(string metasJson)

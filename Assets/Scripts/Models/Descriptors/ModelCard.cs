@@ -2,7 +2,7 @@
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using static UnityConstants;
+using static ModelsBrowserStrings;
 
 namespace Models.Descriptors
 {

@@ -7,7 +7,7 @@ using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
-using static UnityConstants;
+using static ModelsBrowserStrings;
 
 namespace Models
 {
@@ -68,8 +68,6 @@ namespace Models
 
             var includedModels = includedModelsLoader.Load(modelGroup).ToArray();
             var downloadedModels = assetBundleModelsLoader.Load(modelGroup).ToArray();
-            Debug.Log(includedModels.Length);
-            Debug.Log(downloadedModels.Length);
             var cardDescriptors = includedModels
                 .Concat(downloadedModels)
                 .OrderBy(descriptor => favorites.Contains(descriptor.Meta.Id.ToString()))
@@ -87,7 +85,6 @@ namespace Models
             modelCard.modelIcon.sprite = image;
             modelCard.modelName.text = meta.Name;
             modelCard.meta = meta;
-            Debug.Log("b " + meta.Name);
             modelCard.selectButton.onClick.AddListener(selectAction);
             modelCard.favoriteButton.onClick.AddListener(() => modelCard.Favorite(ref favorites));
 

@@ -4,7 +4,7 @@ using System.Linq;
 using Models.Descriptors;
 using Newtonsoft.Json;
 using UnityEngine;
-using static UnityConstants;
+using static ModelsBrowserStrings;
 
 namespace Models.Loaders
 {
@@ -43,7 +43,6 @@ namespace Models.Loaders
         
         private void SelectModelAction(ModelMeta meta)
         {
-            Debug.Log("a " + meta.Id);
             var modelPrefab = Resources.Load($"{IncludedPrefabsPath}/{meta.Id}");
             objectsSpawner.SpawnObject((GameObject) modelPrefab);
         }
