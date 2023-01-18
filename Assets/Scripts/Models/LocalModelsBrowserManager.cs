@@ -51,8 +51,9 @@ namespace Models
             });
             backButton.onClick.AddListener(() =>
             {
-                SetGroupsActive(true);
                 ClearModelCards();
+                SetGroupsActive(true);
+                backButton.gameObject.SetActive(false);
             });
             foreach (var groupCard in groupCards)
             {
