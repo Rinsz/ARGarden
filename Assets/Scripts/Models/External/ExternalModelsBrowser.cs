@@ -90,7 +90,7 @@ namespace Models
 
         private static void LoadImage(ModelMeta meta, ModelDownloadCard modelDownloadCard)
         {
-            var requestResult = ApiClient.SendRequest(url: ApiUrlProvider.GetImageUrl(meta.Id, meta.Version));
+            var requestResult = ApiClient.SendTexturesRequest(url: ApiUrlProvider.GetImageUrl(meta.Id, meta.Version));
             requestResult.completed += _ => SetImageForCard(requestResult.webRequest, modelDownloadCard);
         }
 
