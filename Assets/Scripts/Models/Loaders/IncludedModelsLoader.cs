@@ -4,7 +4,7 @@ using System.Linq;
 using Models.Descriptors;
 using Newtonsoft.Json;
 using UnityEngine;
-using static UnityConstants;
+using static ModelBrowserConstants;
 
 namespace Models.Loaders
 {

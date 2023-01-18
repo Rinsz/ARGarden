@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using Models.Descriptors;
@@ -8,7 +7,7 @@ using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
-using static UnityConstants;
+using static ModelBrowserConstants;
 
 namespace Models
 {
@@ -52,10 +51,10 @@ namespace Models
             });
             backButton.onClick.AddListener(() =>
             {
-                SetGroupsActive(true);
                 ClearModelCards();
+                SetGroupsActive(true);
+                backButton.gameObject.SetActive(false);
             });
-
             foreach (var groupCard in groupCards)
             {
                 groupCard.OnGroupChoose.AddListener(ShowGroupContent);
