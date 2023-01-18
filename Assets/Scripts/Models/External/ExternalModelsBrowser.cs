@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using JetBrains.Annotations;
 using Models.Descriptors;
@@ -50,7 +51,9 @@ namespace Models
 
         private void CreateCards(string metasJson)
         {
-            var metas = JsonConvert.DeserializeObject<List<ModelMeta>>(metasJson) ?? new();
+            using var tr = new StringReader(metasJson);
+            using var jtr = new JsonTextReader(tr);
+            var metas = JsonSerializer.CreateDefault().Deserialize<List<ModelMeta>>(jtr) ?? new();
 
             foreach (var meta in metas)
             {
@@ -90,7 +93,7 @@ namespace Models
 
         private static void LoadImage(ModelMeta meta, ModelDownloadCard modelDownloadCard)
         {
-            var requestResult = ApiClient.SendTexturesRequest(url: ApiUrlProvider.GetImageUrl(meta.Id, meta.Version));
+            var requestResult = ApiClient.SendRequestTexture(url: ApiUrlProvider.GetImageUrl(meta.Id, meta.Version));
             requestResult.completed += _ => SetImageForCard(requestResult.webRequest, modelDownloadCard);
         }
 

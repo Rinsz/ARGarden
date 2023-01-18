@@ -4,7 +4,7 @@ namespace Models.External
 {
     public class ApiClient
     {
-        public static UnityWebRequestAsyncOperation SendTexturesRequest(string url)
+        public static UnityWebRequestAsyncOperation SendRequestTexture(string url)
         {
             var request = UnityWebRequestTexture.GetTexture(url);
             using var certHandler = new StubCertHandler();

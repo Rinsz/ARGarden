@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using UnityEngine;
 
-public static class ModelsBrowserStrings
+public static class ModelBrowserConstants
 {
     public const string Unity3dExtension = ".unity3d";
     

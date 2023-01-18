@@ -7,7 +7,7 @@ using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
-using static ModelsBrowserStrings;
+using static ModelBrowserConstants;
 
 namespace Models
 {
@@ -66,8 +66,8 @@ namespace Models
             SetGroupsActive(false);
             backButton.gameObject.SetActive(true);
 
-            var includedModels = includedModelsLoader.Load(modelGroup).ToArray();
-            var downloadedModels = assetBundleModelsLoader.Load(modelGroup).ToArray();
+            var includedModels = includedModelsLoader.Load(modelGroup);
+            var downloadedModels = assetBundleModelsLoader.Load(modelGroup);
             var cardDescriptors = includedModels
                 .Concat(downloadedModels)
                 .OrderBy(descriptor => favorites.Contains(descriptor.Meta.Id.ToString()))

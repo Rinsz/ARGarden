@@ -5,7 +5,7 @@ using JetBrains.Annotations;
 using Models.Descriptors;
 using Newtonsoft.Json;
 using UnityEngine;
-using static ModelsBrowserStrings;
+using static ModelBrowserConstants;
 
 namespace Models.Loaders
 {
