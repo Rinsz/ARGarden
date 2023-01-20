@@ -33,10 +33,8 @@ namespace Models
 
         public void SetMenuActive(bool active) => menu.SetActive(active);
         
-        private void Start()
-        {
+        private void Start() =>
             objectSpawner.OnSpawned.AddListener(_ => SetMenuActive(false));
-        }
 
         private void Awake()
         {
@@ -46,20 +44,22 @@ namespace Models
             assetBundleModelsLoader = new(serializer, objectSpawner);
             closeButton.onClick.AddListener(() =>
             {
-                ClearModelCards();
                 SetMenuActive(false);
+                ReturnToGroups();
                 onClosedWithoutSpawn.Invoke();
             });
-            backButton.onClick.AddListener(() =>
-            {
-                ClearModelCards();
-                SetGroupsActive(true);
-                backButton.gameObject.SetActive(false);
-            });
+            backButton.onClick.AddListener(ReturnToGroups);
             foreach (var groupCard in groupCards)
             {
                 groupCard.OnGroupChoose.AddListener(ShowGroupContent);
             }
+        }
+
+        private void ReturnToGroups()
+        {
+            ClearModelCards();
+            SetGroupsActive(true);
+            backButton.gameObject.SetActive(false);
         }
 
         private void ShowGroupContent(ModelGroup modelGroup)
