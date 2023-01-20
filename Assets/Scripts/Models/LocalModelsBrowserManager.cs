@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using Extensions;
 using Models.Descriptors;
 using Models.Loaders;
 using Newtonsoft.Json;
@@ -8,6 +9,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 using static ModelBrowserConstants;
+using static UiColorConstants;
 
 namespace Models
 {
@@ -33,13 +35,12 @@ namespace Models
         
         private void Start()
         {
-            favorites = PlayerPrefs.GetString(FavoritesKey).Split(',').ToHashSet();
-
             objectSpawner.OnSpawned.AddListener(_ => SetMenuActive(false));
         }
 
         private void Awake()
         {
+            favorites = PlayerPrefs.GetString(FavoritesKey).Split(',').ToHashSet();
             var serializer = JsonSerializer.Create(new JsonSerializerSettings { Culture = CultureInfo.InvariantCulture });
             includedModelsLoader = new(serializer, objectSpawner);
             assetBundleModelsLoader = new(serializer, objectSpawner);
@@ -70,7 +71,7 @@ namespace Models
             var downloadedModels = assetBundleModelsLoader.Load(modelGroup);
             var cardDescriptors = includedModels
                 .Concat(downloadedModels)
-                .OrderBy(descriptor => favorites.Contains(descriptor.Meta.Id.ToString()))
+                .OrderByDescending(descriptor => favorites.Contains(descriptor.Meta.Id.ToString()))
                 .ThenBy(descriptor => descriptor.Meta.Name);
 
             foreach (var descriptor in cardDescriptors)
@@ -89,7 +90,7 @@ namespace Models
             modelCard.favoriteButton.onClick.AddListener(() => modelCard.Favorite(ref favorites));
 
             if (favorites.Contains(meta.Id.ToString()))
-                modelCard.favoriteButton.image.color = new Color(122, 55, 33);
+                modelCard.favoriteButton.ChangeButtonImageColor(FavoriteButtonActiveColor);
 
             createdCards.Add(card);
         }

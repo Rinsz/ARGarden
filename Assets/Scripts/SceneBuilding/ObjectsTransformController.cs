@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using Extensions;
 using Lean.Touch;
 using Models;
 using ObjectsHandling;
@@ -86,8 +87,9 @@ public class ObjectsTransformController : MonoBehaviour
 
     private void SetMode(TransformControllerMode mode, Button pressedButton)
     {
-        SetButtonColor(pressedButton, SelectedActionButtonColor);
-        buttons.Where(button => button != pressedButton).ToList().ForEach(button => SetButtonColor(button, White));
+        pressedButton.ChangeButtonImageColor(SelectedActionButtonColor);
+        buttons.Where(button => button != pressedButton).ToList().ForEach(button => button.ChangeButtonImageColor(White));
+
         SetEnabledLeanComponents(Mode, false);
         Mode = mode;
         SetEnabledLeanComponents(Mode, true);
@@ -132,6 +134,4 @@ public class ObjectsTransformController : MonoBehaviour
     }
 
     private void Awake() => buttons = new HashSet<Button> { translateButton, rotateButton, scaleButton };
-    
-    private static void SetButtonColor(Button button, Color32 color) => button.GetComponent<Image>().color = color;
 }
