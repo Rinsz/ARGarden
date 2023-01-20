@@ -1,9 +1,11 @@
 using System.Collections.Generic;
+using System.Linq;
 using Lean.Touch;
 using Models;
 using ObjectsHandling;
 using UnityEngine;
 using UnityEngine.UI;
+using static UiColorConstants;
 
 [RequireComponent(typeof(LeanDragTranslate), typeof(LeanPinchScale), typeof(LeanTwistRotateAxis))]
 [RequireComponent(typeof(LeanPinchZoom))]
@@ -11,6 +13,7 @@ public class ObjectsTransformController : MonoBehaviour
 {
     private Dictionary<Transform, Vector3> childrenToStartPositions = new();
     private Dictionary<TransformControllerMode, Behaviour[]> componentsByMode;
+    private ISet<Button> buttons;
     [SerializeField] private Button translateButton;
     [SerializeField] private Button rotateButton;
     [SerializeField] private Button scaleButton;
@@ -81,8 +84,10 @@ public class ObjectsTransformController : MonoBehaviour
 
     public bool ContainsChild(Transform child) => childrenToStartPositions.ContainsKey(child);
 
-    private void SetMode(TransformControllerMode mode)
+    private void SetMode(TransformControllerMode mode, Button pressedButton)
     {
+        SetButtonColor(pressedButton, SelectedActionButtonColor);
+        buttons.Where(button => button != pressedButton).ToList().ForEach(button => SetButtonColor(button, White));
         SetEnabledLeanComponents(Mode, false);
         Mode = mode;
         SetEnabledLeanComponents(Mode, true);
@@ -119,10 +124,14 @@ public class ObjectsTransformController : MonoBehaviour
             [TransformControllerMode.Rotate] = new Behaviour[] { GetComponent<LeanTwistRotateAxis>() },
             [TransformControllerMode.Scale] = new Behaviour[] { GetComponent<LeanPinchScale>() }
         };
-        translateButton.onClick.AddListener(() => SetMode(TransformControllerMode.Translate));
-        rotateButton.onClick.AddListener(() => SetMode(TransformControllerMode.Rotate));
-        scaleButton.onClick.AddListener(() => SetMode(TransformControllerMode.Scale));
+        translateButton.onClick.AddListener(() => SetMode(TransformControllerMode.Translate, translateButton));
+        rotateButton.onClick.AddListener(() => SetMode(TransformControllerMode.Rotate, rotateButton));
+        scaleButton.onClick.AddListener(() => SetMode(TransformControllerMode.Scale, scaleButton));
 
-        SetMode(TransformControllerMode.Translate);
+        SetMode(TransformControllerMode.Translate, translateButton);
     }
+
+    private void Awake() => buttons = new HashSet<Button> { translateButton, rotateButton, scaleButton };
+    
+    private static void SetButtonColor(Button button, Color32 color) => button.GetComponent<Image>().color = color;
 }
