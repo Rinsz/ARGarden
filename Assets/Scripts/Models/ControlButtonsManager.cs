@@ -4,8 +4,6 @@ using UnityEngine.Scripting;
 
 public class ControlButtonsManager : MonoBehaviour
 {
-    private const string NullButtonError = "{0} must be specified";
-
     private GameObject[] allButtons;
 
     [SerializeField, RequiredMember] private GameObject approveButton;
@@ -14,12 +12,10 @@ public class ControlButtonsManager : MonoBehaviour
     [SerializeField] private GameObject scaleButton;
     [SerializeField] private GameObject rotateButton;
 
-    public void Awake()
-    {
+    public void Awake() =>
         allButtons = new[] { approveButton, revertButton, translateButton, scaleButton, rotateButton }
             .Where(component => component)
             .ToArray();
-    }
 
     public void SetAllButtons(bool active)
     {
