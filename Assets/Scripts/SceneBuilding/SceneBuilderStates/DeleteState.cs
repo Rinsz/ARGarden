@@ -22,6 +22,7 @@ namespace ObjectsHandling.SceneBuilderStates
         {
             foreach (var handledObject in handledObjects)
                 handledObject.gameObject.SetActive(true);
+            controlButtonsManager.SetAllButtons(false);
         }
 
         public override void OnObjectTap(TranslatedObject translatedObject)

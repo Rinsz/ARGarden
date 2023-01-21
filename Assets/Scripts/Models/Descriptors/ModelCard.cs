@@ -1,8 +1,10 @@
 ﻿using System.Collections.Generic;
+using Extensions;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using static ModelBrowserConstants;
+using static UiColorConstants;
 
 namespace Models.Descriptors
 {
@@ -21,12 +23,12 @@ namespace Models.Descriptors
             if (favorites.Contains(id))
             {
                 favorites.Remove(id);
-                favoriteButton.image.color = new Color(255, 255, 255);
+                favoriteButton.ChangeButtonImageColor(White);
             }
             else
             {
                 favorites.Add(id);
-                favoriteButton.image.color = new Color(122, 55, 33);
+                favoriteButton.ChangeButtonImageColor(FavoriteButtonActiveColor);
             }
 
             PlayerPrefs.SetString(FavoritesKey, string.Join(",", favorites));

@@ -28,6 +28,7 @@ namespace ObjectsHandling.SceneBuilderStates
         public override void Revert(HashSet<TranslatedObject> handledObjects)
         {
             objectsTransformController.DestroyAllChildren();
+            controlButtonsManager.SetAllButtons(false);
         }
 
         public override void OnObjectTap(TranslatedObject translatedObject)
