@@ -76,10 +76,12 @@ namespace Screenshots
         private Behaviour[] GetComponentsToHide()
         {
             var canvas = FindObjectOfType<Canvas>();
-            var trackables = FindObjectsOfType<ARPlaneMeshVisualizer>();
-            return trackables
+            var planeMeshVisualizers = FindObjectsOfType<ARPlaneMeshVisualizer>();
+
+            return planeMeshVisualizers
                 .Cast<Behaviour>()
                 .Append(canvas)
+                .Where(behaviour => behaviour.enabled)
                 .ToArray();
         }
 

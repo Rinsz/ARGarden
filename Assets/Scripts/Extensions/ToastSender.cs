@@ -26,7 +26,6 @@ namespace Extensions
 
         private void SendByInstance(string message)
         {
-            
             var context = currentActivity.Call<AndroidJavaObject>("getApplicationContext");
             var toastClass = new AndroidJavaClass("android.widget.Toast");
             var javaString = new AndroidJavaObject("java.lang.String", message);
