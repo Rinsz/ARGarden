@@ -30,12 +30,16 @@ public class ObjectSpawner : MonoBehaviour
         var hits = new List<ARRaycastHit>();
         arRaycastManager.Raycast(screenCenter, hits, TrackableType.Planes);
 
-        var thisTransform = transform;
-        var pose = hits.Count > 0
-            ? hits[0].pose
-            : new Pose(thisTransform.position, thisTransform.rotation);
+        var pose = GetObjectPose(hits, camera.transform);
 
         Instantiate(prefab, pose.position, pose.rotation);
+    }
+
+    private Pose GetObjectPose(List<ARRaycastHit> hits, Transform cameraTransform)
+    {
+        if (hits.Count > 0)
+            return hits[0].pose;
+        return new Pose(cameraTransform.position + cameraTransform.forward, Quaternion.identity);
     }
 
     private void Instantiate(GameObject prefab, Vector3 position, Quaternion rotation)
