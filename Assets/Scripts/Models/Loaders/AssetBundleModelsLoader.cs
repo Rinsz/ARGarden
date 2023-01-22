@@ -23,7 +23,10 @@ namespace Models.Loaders
         public IEnumerable<ModelCardDescriptor> Load(ModelGroup group)
         {
             var streamingAssetsPath = CachedBundlesPath;
-            var files = new DirectoryInfo(streamingAssetsPath).GetFiles();
+            var assetsDirectory = new DirectoryInfo(streamingAssetsPath);
+            if (!assetsDirectory.Exists) assetsDirectory.Create();
+
+            var files = assetsDirectory.GetFiles();
             var loadedBundles = files
                 .Where(file => file.Extension == Unity3dExtension)
                 .Select(file => file.Name.Replace(Unity3dExtension, string.Empty));
