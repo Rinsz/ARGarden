@@ -1,11 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using JetBrains.Annotations;
 using Models.Descriptors;
 using Newtonsoft.Json;
 using UnityEngine;
-using UnityEngine.UIElements;
 using static ModelBrowserConstants;
 
 namespace Models.Loaders
@@ -38,22 +36,21 @@ namespace Models.Loaders
 
             foreach (var bundleInfo in loadedBundles)
             {
-                var (meta, image) = bundleInfo;
+                var (metaFileInfo, imageFileInfo) = bundleInfo;
 
-                var met = LoadMeta(meta);
-                if (met == null || (met.ModelGroup != group &&
-                                    met.ModelGroup != ModelGroup.Unknown &&
+                var meta = LoadMeta(metaFileInfo);
+                if (meta == null || (meta.ModelGroup != group &&
+                                    meta.ModelGroup != ModelGroup.Unknown &&
                                     group != ModelGroup.Unknown))
                 {
                     continue;
                 }
 
-                var sprite = LoadImage(image);
                 yield return new ModelCardDescriptor
                 {
-                    Meta = met,
-                    Image = sprite,
-                    SelectAction = () => SelectBundleAction(met),
+                    Meta = meta,
+                    Image = LoadImage(imageFileInfo),
+                    SelectAction = () => SelectBundleAction(meta),
                 };
             }
         }
