@@ -1191,7 +1191,7 @@ MonoBehaviour:
   m_FocusMode: -1
   m_LightEstimationMode: -1
   m_AutoFocus: 1
-  m_LightEstimation: 0
+  m_LightEstimation: -1
   m_FacingDirection: 1
 --- !u!114 &248023861
 MonoBehaviour:
@@ -2357,7 +2357,7 @@ PrefabInstance:
     - target: {fileID: 1424246829787654642, guid: cc6c4c9cb537a9544ac72d168f2e3ebe,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 383.1163
+      value: 383.11694
       objectReference: {fileID: 0}
     - target: {fileID: 1424246830060781702, guid: cc6c4c9cb537a9544ac72d168f2e3ebe,
         type: 3}
@@ -2434,6 +2434,17 @@ PrefabInstance:
       propertyPath: m_SizeDelta.x
       value: -17
       objectReference: {fileID: 0}
+    - target: {fileID: 1424246831394619913, guid: cc6c4c9cb537a9544ac72d168f2e3ebe,
+        type: 3}
+      propertyPath: m_sharedMaterial
+      value: 
+      objectReference: {fileID: -8286319138318730944, guid: 5b96aa3a97eb9cf41894aad362927745,
+        type: 2}
+    - target: {fileID: 1424246831394619913, guid: cc6c4c9cb537a9544ac72d168f2e3ebe,
+        type: 3}
+      propertyPath: m_hasFontAssetChanged
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4642093899518798896, guid: cc6c4c9cb537a9544ac72d168f2e3ebe,
         type: 3}
       propertyPath: m_AnchorMax.y
@@ -2472,7 +2483,7 @@ PrefabInstance:
     - target: {fileID: 4642093899837673219, guid: cc6c4c9cb537a9544ac72d168f2e3ebe,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0.000030517578
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4642093899904913689, guid: cc6c4c9cb537a9544ac72d168f2e3ebe,
         type: 3}
@@ -3292,6 +3303,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1071853391}
   - component: {fileID: 1071853390}
+  - component: {fileID: 1071853392}
   m_Layer: 0
   m_Name: Directional Light
   m_TagString: Untagged
@@ -3376,6 +3388,20 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
+--- !u!114 &1071853392
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1071853389}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa111ff6ff04420887819a4679c5afd8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_CameraManager: {fileID: 248023860}
+  m_Arrow: {fileID: 0}
 --- !u!1 &1089652834
 GameObject:
   m_ObjectHideFlags: 0
