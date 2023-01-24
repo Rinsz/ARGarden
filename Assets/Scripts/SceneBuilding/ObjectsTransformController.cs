@@ -27,8 +27,10 @@ public class ObjectsTransformController : MonoBehaviour
         {
             Debug.Log($"Trying to add already linked child. Name: '{child.gameObject.name}'");
         }
+
         var oldPosition = transform.position;
-        transform.position = (oldPosition * childrenToStartPositions.Count + child.transform.position) / (childrenToStartPositions.Count + 1);
+        transform.position = (oldPosition * childrenToStartPositions.Count + child.transform.position) /
+                             (childrenToStartPositions.Count + 1);
         if (childrenToStartPositions.Count > 0) AdjustChildrenPositions(oldPosition);
 
         childrenToStartPositions.Add(child, child.position);
@@ -47,7 +49,8 @@ public class ObjectsTransformController : MonoBehaviour
         var oldPosition = transform.position;
         if (childrenToStartPositions.Count > 0)
         {
-            transform.position = (transform.position * (childrenToStartPositions.Count + 1) - child.position) / childrenToStartPositions.Count;
+            transform.position = (transform.position * (childrenToStartPositions.Count + 1) - child.position) /
+                                 childrenToStartPositions.Count;
             AdjustChildrenPositions(oldPosition);
         }
     }
@@ -88,7 +91,10 @@ public class ObjectsTransformController : MonoBehaviour
     private void SetMode(TransformControllerMode mode, Button pressedButton)
     {
         pressedButton.ChangeButtonImageColor(SelectedActionButtonColor);
-        buttons.Where(button => button != pressedButton).ToList().ForEach(button => button.ChangeButtonImageColor(White));
+        buttons
+            .Where(button => button != pressedButton)
+            .ToList()
+            .ForEach(button => button.ChangeButtonImageColor(White));
 
         SetEnabledLeanComponents(Mode, false);
         Mode = mode;

@@ -53,7 +53,7 @@ namespace Models
             var borderStartPosition = cameraPosition + cameraDirection * minimalDistance;
             var positionFromBorderStart = position - borderStartPosition;
 
-            var angleToForward = Vector3.Angle(positionFromBorderStart, cameraDirection) * (float) Math.PI / 180f;
+            var angleToForward = Vector3.Angle(positionFromBorderStart, cameraDirection) * (float)Math.PI / 180f;
             var cosToForward = Mathf.Cos(angleToForward);
             if (cosToForward >= 0)
                 return position;
