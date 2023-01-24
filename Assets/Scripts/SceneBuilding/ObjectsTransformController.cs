@@ -8,7 +8,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using static UiColorConstants;
 
-[RequireComponent(typeof(LeanDragTranslate), typeof(LeanPinchScale), typeof(LeanTwistRotateAxis))]
+[RequireComponent(typeof(LeanDragTranslate), typeof(LeanPinchScale), typeof(LeanMultiRotate))]
 [RequireComponent(typeof(LeanPinchZoom))]
 public class ObjectsTransformController : MonoBehaviour
 {
@@ -123,7 +123,7 @@ public class ObjectsTransformController : MonoBehaviour
                 GetComponent<LeanDragTranslate>(),
                 GetComponent<LeanPinchZoom>()
             },
-            [TransformControllerMode.Rotate] = new Behaviour[] { GetComponent<LeanTwistRotateAxis>() },
+            [TransformControllerMode.Rotate] = new Behaviour[] { GetComponent<LeanMultiRotate>() },
             [TransformControllerMode.Scale] = new Behaviour[] { GetComponent<LeanPinchScale>() }
         };
         translateButton.onClick.AddListener(() => SetMode(TransformControllerMode.Translate, translateButton));
