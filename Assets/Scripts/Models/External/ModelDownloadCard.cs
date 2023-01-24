@@ -51,6 +51,11 @@ namespace Models.Descriptors
                 using var sw = new StreamWriter(metaFileStream);
                 JsonSerializer.Create().Serialize(sw, meta);
 
+                var modelImage = modelIcon.sprite.texture;
+                var imageBytes = modelImage.EncodeToJPG();
+                using var imageFileStream = new FileStream(Path.Combine(cachePath, $"{meta.Id}.jpg"), FileMode.Create);
+                imageFileStream.Write(imageBytes, 0, imageBytes.Length);
+
                 Debug.Log($"Download completed: {meta.Name}/{meta.ModelGroup}");
                 Debug.Log($"Saved to: {Caching.currentCacheForWriting.path}");
                 downloadButton.gameObject.SetActive(false);
@@ -68,6 +73,10 @@ namespace Models.Descriptors
             var metaPath = Path.Combine(cachePath, $"{meta.Id}.json");
             if (File.Exists(metaPath))
                 File.Delete(metaPath);
+            
+            var imagePath = Path.Combine(cachePath, $"{meta.Id}.jpg");
+            if (File.Exists(imagePath))
+                File.Delete(imagePath);
             
             downloadButton.gameObject.SetActive(true);
             deleteButton.gameObject.SetActive(false);

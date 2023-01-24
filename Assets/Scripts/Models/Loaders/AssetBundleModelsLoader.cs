@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using JetBrains.Annotations;
 using Models.Descriptors;
 using Newtonsoft.Json;
 using UnityEngine;
@@ -24,49 +23,53 @@ namespace Models.Loaders
         {
             var streamingAssetsPath = CachedBundlesPath;
             var assetsDirectory = new DirectoryInfo(streamingAssetsPath);
-            if (!assetsDirectory.Exists) assetsDirectory.Create();
+            if (!assetsDirectory.Exists)
+                assetsDirectory.Create();
 
             var files = assetsDirectory.GetFiles();
             var loadedBundles = files
-                .Where(file => file.Extension == Unity3dExtension)
-                .Select(file => file.Name.Replace(Unity3dExtension, string.Empty));
+                .GroupBy(file => file.Name.Split('.')[0])
+                .Where(gFiles => gFiles.Count() == 3)
+                .Select(filesGroup => (
+                    Meta: filesGroup.First(f => f.Extension == ".json"),
+                    Image: filesGroup.First(f => f.Extension == ".jpg")));
 
-            foreach (var filename in loadedBundles)
+            foreach (var bundleInfo in loadedBundles)
             {
-                var bundle = LoadBundle(streamingAssetsPath, filename);
-                var meta = LoadMeta(bundle, filename);
-                if (meta == null)
-                    continue;
+                var (metaFileInfo, imageFileInfo) = bundleInfo;
 
-                if (meta.ModelGroup != group && meta.ModelGroup != ModelGroup.Unknown && group != ModelGroup.Unknown)
+                var meta = LoadMeta(metaFileInfo);
+                if (meta == null || (meta.ModelGroup != group &&
+                                    meta.ModelGroup != ModelGroup.Unknown &&
+                                    group != ModelGroup.Unknown))
                 {
-                    bundle.UnloadAsync(true);
                     continue;
                 }
 
-                var image = bundle.LoadAsset<Sprite>(filename);
-                bundle.UnloadAsync(false);
                 yield return new ModelCardDescriptor
                 {
                     Meta = meta,
-                    Image = image,
+                    Image = LoadImage(imageFileInfo),
                     SelectAction = () => SelectBundleAction(meta),
                 };
             }
         }
 
-        private static AssetBundle LoadBundle(string streamingAssetsPath, string filename)
+        private static Sprite LoadImage(FileInfo image)
         {
-            using var fs = File.OpenRead(Path.Combine(streamingAssetsPath, $"{filename}{Unity3dExtension}"));
-            var bundleRequest = AssetBundle.LoadFromStreamAsync(fs);
-
-            return bundleRequest.assetBundle;
+            var img = File.ReadAllBytes(image.FullName);
+            var tex = new Texture2D(2, 2);
+            tex.LoadImage(img);
+            return Sprite.Create(
+                tex,
+                new Rect(0, 0, tex.width, tex.height),
+                new Vector2(tex.width / 2, tex.height / 2));
         }
 
-        [CanBeNull]
-        private ModelMeta LoadMeta(AssetBundle bundle, string filename)
+        private ModelMeta LoadMeta(FileInfo meta)
         {
-            using var sr = new StringReader(bundle.LoadAsset<TextAsset>(filename).text);
+            var rawMeta = meta.OpenText().ReadToEnd();
+            using var sr = new StringReader(rawMeta);
             using var jsonReader = new JsonTextReader(sr);
             return serializer.Deserialize<ModelMeta>(jsonReader);
         }
