@@ -2,7 +2,7 @@ using Lean.Touch;
 using UnityEngine;
 using UnityEngine.Events;
 
-[RequireComponent(typeof(LeanFingerTap), typeof(Outline))]
+[RequireComponent(typeof(LeanFingerTap), typeof(Outline), typeof(DepthTarget))]
 public class TranslatedObject : MonoBehaviour
 {
     private Outline outLine;
