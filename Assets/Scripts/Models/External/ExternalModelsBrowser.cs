@@ -100,6 +100,9 @@ namespace Models
         private static void SetImageForCard(UnityWebRequest webRequest, ModelDownloadCard modelDownloadCard)
         {
             var texture = DownloadHandlerTexture.GetContent(webRequest);
+            if (!modelDownloadCard.modelIcon)
+                return;
+
             modelDownloadCard.modelIcon.sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height),
                 new Vector2(texture.width / 2, texture.height / 2));
         }
