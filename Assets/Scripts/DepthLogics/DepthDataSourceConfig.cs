@@ -13,6 +13,7 @@ public class DepthDataSourceConfig : ScriptableObject
     public void Awake()
     {
         var type = Type.GetType(DepthSourceClassName);
-        DepthDataSource = (IDepthDataSource)Activator.CreateInstance(type);
+        if (type != null)
+            DepthDataSource = (IDepthDataSource)Activator.CreateInstance(type);
     }
 }
