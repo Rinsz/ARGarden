@@ -1,198 +1,72 @@
-﻿using UnityEngine.Rendering;
+﻿using UnityEngine;
+using UnityEngine.Rendering;
+using UnityEngine.XR.ARFoundation;
 
-namespace UnityEngine.XR.ARFoundation.Samples
+[RequireComponent(typeof(Light))]
+public class HDRLightEstimation : MonoBehaviour
 {
-    /// <summary>
-    /// A component that can be used to access the most recently received HDR light estimation information
-    /// for the physical environment as observed by an AR device.
-    /// </summary>
-    [RequireComponent(typeof(Light))]
-    public class HDRLightEstimation : MonoBehaviour
+    private Light _light;
+    private ARCameraManager _cameraManager;
+
+    private void Start()
     {
-        [SerializeField]
-        [Tooltip("The ARCameraManager which will produce frame events containing light estimation information.")]
-        ARCameraManager m_CameraManager;
+        _light = GetComponent<Light>();
+        _cameraManager = FindObjectOfType<ARCameraManager>();
 
-        [SerializeField]
-        Transform m_Arrow;
-
-        public Transform arrow
+        if (_cameraManager != null)
         {
-            get => m_Arrow;
-            set => m_Arrow = value;
+            _cameraManager.frameReceived += OnFrameReceived;
+        }
+    }
+
+    private void OnDestroy()
+    {
+        if (_cameraManager != null)
+        {
+            _cameraManager.frameReceived -= OnFrameReceived;
+        }
+    }
+
+    private void OnFrameReceived(ARCameraFrameEventArgs eventArgs)
+    {
+        // Light intensity:
+        if (eventArgs.lightEstimation.mainLightIntensityLumens.HasValue)
+        {
+            _light.intensity = eventArgs.lightEstimation.mainLightIntensityLumens.Value;
+        }
+        else if (eventArgs.lightEstimation.averageBrightness.HasValue)
+        {
+            _light.intensity = eventArgs.lightEstimation.averageBrightness.Value;
         }
 
-        /// <summary>
-        /// Get or set the <c>ARCameraManager</c>.
-        /// </summary>
-        public ARCameraManager cameraManager
+        // Light color:
+        if (eventArgs.lightEstimation.mainLightColor.HasValue)
         {
-            get { return m_CameraManager; }
-            set
-            {
-                if (m_CameraManager == value)
-                    return;
-
-                if (m_CameraManager != null)
-                    m_CameraManager.frameReceived -= FrameChanged;
-
-                m_CameraManager = value;
-
-                if (m_CameraManager != null & enabled)
-                    m_CameraManager.frameReceived += FrameChanged;
-            }
+            _light.color = eventArgs.lightEstimation.mainLightColor.Value;
         }
-        
-        /// <summary>
-        /// The estimated brightness of the physical environment, if available.
-        /// </summary>
-        public float? brightness { get; private set; }
-
-        /// <summary>
-        /// The estimated color temperature of the physical environment, if available.
-        /// </summary>
-        public float? colorTemperature { get; private set; }
-
-        /// <summary>
-        /// The estimated color correction value of the physical environment, if available.
-        /// </summary>
-        public Color? colorCorrection { get; private set; }
-        
-        /// <summary>
-        /// The estimated direction of the main light of the physical environment, if available.
-        /// </summary>
-        public Vector3? mainLightDirection { get; private set; }
-
-        /// <summary>
-        /// The estimated color of the main light of the physical environment, if available.
-        /// </summary>
-        public Color? mainLightColor { get; private set; }
-
-        /// <summary>
-        /// The estimated intensity in lumens of main light of the physical environment, if available.
-        /// </summary>
-        public float? mainLightIntensityLumens { get; private set; }
-
-        /// <summary>
-        /// The estimated spherical harmonics coefficients of the physical environment, if available.
-        /// </summary>
-        public SphericalHarmonicsL2? sphericalHarmonics { get; private set; }
-
-        void Awake ()
+        else if (eventArgs.lightEstimation.colorCorrection.HasValue)
         {
-            m_Light = GetComponent<Light>();
+            _light.color = eventArgs.lightEstimation.colorCorrection.Value;
         }
 
-        void OnEnable()
+        // Color Temperature:
+        if (eventArgs.lightEstimation.averageColorTemperature.HasValue)
         {
-            if (m_CameraManager != null)
-                m_CameraManager.frameReceived += FrameChanged;
-
-            // Disable the arrow to start; enable it later if we get directional light info
-            if (arrow)
-            {
-                arrow.gameObject.SetActive(false);
-            }
-            Application.onBeforeRender += OnBeforeRender;
+            _light.colorTemperature = eventArgs.lightEstimation.averageColorTemperature.Value;
         }
 
-        void OnDisable()
+        // Light direction:
+        if (eventArgs.lightEstimation.mainLightDirection.HasValue)
         {
-            Application.onBeforeRender -= OnBeforeRender;
-
-            if (m_CameraManager != null)
-                m_CameraManager.frameReceived -= FrameChanged;
+            _light.transform.rotation = Quaternion.LookRotation(
+                eventArgs.lightEstimation.mainLightDirection.Value);
         }
 
-        void OnBeforeRender()
+        // Ambinent Probe:
+        if (eventArgs.lightEstimation.ambientSphericalHarmonics.HasValue)
         {
-            if (arrow && m_CameraManager)
-            {
-                var cameraTransform = m_CameraManager.GetComponent<Camera>().transform;
-                arrow.position = cameraTransform.position + cameraTransform.forward * .25f;
-            }
+            RenderSettings.ambientMode = AmbientMode.Skybox;
+            RenderSettings.ambientProbe = eventArgs.lightEstimation.ambientSphericalHarmonics.Value;
         }
-
-        void FrameChanged(ARCameraFrameEventArgs args)
-        {
-            if (args.lightEstimation.averageBrightness.HasValue)
-            {
-                brightness = args.lightEstimation.averageBrightness.Value;
-                m_Light.intensity = brightness.Value;
-            }
-            else
-            {
-                brightness = null;
-            }
-
-            if (args.lightEstimation.averageColorTemperature.HasValue)
-            {
-                colorTemperature = args.lightEstimation.averageColorTemperature.Value;
-                m_Light.colorTemperature = colorTemperature.Value;
-            }
-            else
-            {
-                colorTemperature = null;
-            }
-
-            if (args.lightEstimation.colorCorrection.HasValue)
-            {
-                colorCorrection = args.lightEstimation.colorCorrection.Value;
-                m_Light.color = colorCorrection.Value;
-            }
-            else
-            {
-                colorCorrection = null;
-            }
-            
-            if (args.lightEstimation.mainLightDirection.HasValue)
-            {
-                mainLightDirection = args.lightEstimation.mainLightDirection;
-                m_Light.transform.rotation = Quaternion.LookRotation(mainLightDirection.Value);
-                if (arrow)
-                {
-                    arrow.gameObject.SetActive(true);
-                    arrow.rotation = Quaternion.LookRotation(mainLightDirection.Value);
-                }
-            }
-            else if (arrow)
-            {
-                arrow.gameObject.SetActive(false);
-                mainLightDirection = null;
-            }
-
-            if (args.lightEstimation.mainLightColor.HasValue)
-            {
-                mainLightColor = args.lightEstimation.mainLightColor;
-                m_Light.color = mainLightColor.Value;
-            }
-            else
-            {
-                mainLightColor = null;
-            }
-
-            if (args.lightEstimation.mainLightIntensityLumens.HasValue)
-            {
-                mainLightIntensityLumens = args.lightEstimation.mainLightIntensityLumens;
-                m_Light.intensity = args.lightEstimation.averageMainLightBrightness.Value;
-            }
-            else
-            {
-                mainLightIntensityLumens = null;
-            }
-
-            if (args.lightEstimation.ambientSphericalHarmonics.HasValue)
-            {
-                sphericalHarmonics = args.lightEstimation.ambientSphericalHarmonics;
-                RenderSettings.ambientMode = AmbientMode.Skybox;
-                RenderSettings.ambientProbe = sphericalHarmonics.Value;
-            }
-            else
-            {
-                sphericalHarmonics = null;
-            }
-        }
-
-        Light m_Light;
     }
 }
